@@ -1,4 +1,4 @@
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 using System;
 using System.Linq;
@@ -10,19 +10,19 @@ namespace Mochie {
 
     public class UnderwaterEditor : ShaderGUI {
 
-        GUIContent causticsTexLabel = new GUIContent("Caustics Texture");
-        GUIContent causticsFlipbookLabel = new GUIContent("Caustics Flipbook");
-        GUIContent distortionTexLabel = new GUIContent("Distortion Texture");
+        GUIContent causticsTexLabel = new GUIContent("焦散贴图");
+        GUIContent causticsFlipbookLabel = new GUIContent("焦散序列帧");
+        GUIContent distortionTexLabel = new GUIContent("扭曲贴图");
 
         public static Dictionary<Material, Toggles> foldouts = new Dictionary<Material, Toggles>();
         Toggles toggles = new Toggles(new string[] {
-            "Base",
-            "Blur",
-            "Caustics",
-            "Fog"
+            "基础",
+            "模糊",
+            "焦散",
+            "雾"
         }, 0);
 
-        string versionLabel = "v1.3";
+        string versionLabel = "v1.3 | LGC 中文版 1.78.1";
 
         // Base
         MaterialProperty _StencilRef = null;
@@ -95,51 +95,51 @@ namespace Mochie {
                 ApplyMaterialSettings(mat);
             }
 
-            MGUI.DoHeader("UNDERWATER");
+            MGUI.DoHeader("水下");
 
             EditorGUI.BeginChangeCheck(); {
 
                 // Base
-                Foldouts.DoFoldout(foldouts, mat, "Base", 1, Foldouts.Style.StandardButton);
+                Foldouts.DoFoldout(foldouts, mat, "基础", 1, Foldouts.Style.StandardButton);
                 if (Foldouts.DoFoldoutButton(MGUI.collapseLabel, 11)) Toggles.CollapseFoldouts(mat, foldouts, 1);
-                if (Foldouts.BeginFoldout(foldouts, mat, "Base")) {
+                if (Foldouts.BeginFoldout(foldouts, mat, "基础")) {
                     MGUI.PropertyGroupParent(()=>{
                         MGUI.PropertyGroup(()=>{
                             me.RenderQueueField();
-                            me.ShaderProperty(_StencilRef, "Stencil Reference");
-                            me.ShaderProperty(_Falloff, "Falloff");
+                            me.ShaderProperty(_StencilRef, "模板参考值");
+                            me.ShaderProperty(_Falloff, "衰减");
                             if (_Falloff.floatValue == 1f){
-                                MGUI.Vector3Field(_BoxSize, "Size", false);
-                                MGUI.Vector3Field(_BoxOffset, "Offset", false);
+                                MGUI.Vector3Field(_BoxSize, "尺寸", false);
+                                MGUI.Vector3Field(_BoxOffset, "偏移", false);
                             }
                         });
-                        MGUI.DisplayInfo("   This shader requires a \"Depth Light\" prefab be present in the scene.\n   (Found in: Assets/Mochie/Unity/Prefabs)");
+                        MGUI.DisplayInfo("   该着色器需要场景中存在“Depth Light”预制件。\n （发现于：Assets/Mochie/Unity/Prefabs）");
                     });
                 }
                 Foldouts.EndFoldout();
 
                 // Blur
-                if (Foldouts.DoFoldout(foldouts, mat, me, _DoFToggle, "Blur", Foldouts.Style.StandardToggle)) {
+                if (Foldouts.DoFoldout(foldouts, mat, me, _DoFToggle, "模糊", Foldouts.Style.StandardToggle)) {
                     MGUI.PropertyGroupParent(()=>{
                         MGUI.ToggleGroup(_DoFToggle.floatValue == 0);
                         MGUI.PropertyGroup(()=>{
-                            me.ShaderProperty(_BlurStr, "Strength");
-                            me.ShaderProperty(_HQBlur, "High Quality");
-                            me.ShaderProperty(_DepthToggle, "Depth of Field");
+                            me.ShaderProperty(_BlurStr, "强度");
+                            me.ShaderProperty(_HQBlur, "高质量");
+                            me.ShaderProperty(_DepthToggle, "景深");
                             if (_DepthToggle.floatValue == 1){
-                                me.ShaderProperty(_Radius, "Radius");
-                                me.ShaderProperty(_Fade, "Fade");
+                                me.ShaderProperty(_Radius, "半径");
+                                me.ShaderProperty(_Fade, "渐隐");
                             }
                         });
                         MGUI.PropertyGroup(()=>{
-                            me.ShaderProperty(_Color, "Screen Tint");
+                            me.ShaderProperty(_Color, "屏幕色调");
                             if (_AutoShift.floatValue == 0)
-                                me.ShaderProperty(_Hue, "Hue");
+                                me.ShaderProperty(_Hue, "色调");
                             else
-                                me.ShaderProperty(_AutoShiftSpeed, "Shift Speed");
+                                me.ShaderProperty(_AutoShiftSpeed, "偏移速度");
                             me.ShaderProperty(_HueMode, Tips.hueModeText);
                             me.ShaderProperty(_MonoTint, Tips.monoTintText);
-                            me.ShaderProperty(_AutoShift, "Auto Hue Shift");
+                            me.ShaderProperty(_AutoShift, "自动色调偏移");
                         });
                         MGUI.ToggleGroupEnd();
                     });
@@ -147,36 +147,36 @@ namespace Mochie {
                 Foldouts.EndFoldout();
 
                 // Caustics
-                if (Foldouts.DoFoldout(foldouts, mat, me, _CausticsToggle, "Caustics", Foldouts.Style.StandardToggle)) {
+                if (Foldouts.DoFoldout(foldouts, mat, me, _CausticsToggle, "焦散", Foldouts.Style.StandardToggle)) {
                     MGUI.PropertyGroupParent(()=>{
                         MGUI.ToggleGroup(_CausticsToggle.floatValue == 0);
                         MGUI.PropertyGroup(()=>{
-                            me.ShaderProperty(_CausticsMode, "Style");
+                            me.ShaderProperty(_CausticsMode, "样式");
                             if (_CausticsMode.floatValue == 1){
                                 me.TexturePropertySingleLine(causticsTexLabel, _CausticsTex);
                             }
                             else if (_CausticsMode.floatValue == 2){
                                 me.TexturePropertySingleLine(causticsFlipbookLabel, _CausticsTexArray);
                             }
-                            me.ShaderProperty(_CausticsColor, "Color");
-                            me.ShaderProperty(_CausticsOpacity, "Strength");
-                            me.ShaderProperty(_CausticsRange, "Range");
-                            me.ShaderProperty(_CausticsFade, "Fade");
-                            
+                            me.ShaderProperty(_CausticsColor, "颜色");
+                            me.ShaderProperty(_CausticsOpacity, "强度");
+                            me.ShaderProperty(_CausticsRange, "范围");
+                            me.ShaderProperty(_CausticsFade, "渐隐");
+
                             if (_CausticsMode.floatValue == 0){
-                                me.ShaderProperty(_CausticsPower, "Power");
-                                me.ShaderProperty(_CausticsDisp, "Dispersion");
+                                me.ShaderProperty(_CausticsPower, "强度");
+                                me.ShaderProperty(_CausticsDisp, "色散");
                             }
                             if (_CausticsMode.floatValue != 2){
-                                me.ShaderProperty(_CausticsSpeed, "Speed");
-                                me.ShaderProperty(_CausticsScale, "Scale");
+                                me.ShaderProperty(_CausticsSpeed, "速度");
+                                me.ShaderProperty(_CausticsScale, "缩放");
                             }
                             else {
-                                me.ShaderProperty(_CausticsFlipbookSpeed, "Speed");
-                                me.ShaderProperty(_CausticsScale, "Scale");
-                                me.ShaderProperty(_CausticsFlipbookDisp, "Dispersion");
+                                me.ShaderProperty(_CausticsFlipbookSpeed, "速度");
+                                me.ShaderProperty(_CausticsScale, "缩放");
+                                me.ShaderProperty(_CausticsFlipbookDisp, "色散");
                             }
-                            
+
                             MGUI.ToggleGroup(_CausticsRotateWithLight.floatValue == 1);
                             MGUI.Vector3Field(_CausticsRotation, Tips.causticsRotation, false);
                             MGUI.ToggleGroupEnd();
@@ -185,9 +185,9 @@ namespace Mochie {
                         if (_CausticsMode.floatValue != 2){
                             MGUI.PropertyGroup(()=>{
                                 me.TexturePropertySingleLine(distortionTexLabel, _CausticsDistortionTex);
-                                me.ShaderProperty(_CausticsDistortion, "Distortion Strength");
-                                me.ShaderProperty(_CausticsDistortionScale, "Distortion Scale");
-                                MGUI.Vector2Field(_CausticsDistortionSpeed, "Distortion Speed");
+                                me.ShaderProperty(_CausticsDistortion, "扭曲强度");
+                                me.ShaderProperty(_CausticsDistortionScale, "扭曲缩放");
+                                MGUI.Vector2Field(_CausticsDistortionSpeed, "扭曲速度");
                             });
                         }
                         MGUI.ToggleGroupEnd();
@@ -196,14 +196,14 @@ namespace Mochie {
                 Foldouts.EndFoldout();
 
                 // Fog
-                if (Foldouts.DoFoldout(foldouts, mat, me, _FogToggle, "Fog", Foldouts.Style.StandardToggle)) {
+                if (Foldouts.DoFoldout(foldouts, mat, me, _FogToggle, "雾", Foldouts.Style.StandardToggle)) {
                     MGUI.PropertyGroupParent(()=>{
                         MGUI.ToggleGroup(_FogToggle.floatValue == 0);
                         MGUI.PropertyGroup(()=>{
-                            me.ShaderProperty(_FogTint, "Color");
-                            me.ShaderProperty(_FogOpacity, "Opacity");
-                            me.ShaderProperty(_FogRadius, "Radius");
-                            me.ShaderProperty(_FogFade, "Fade");
+                            me.ShaderProperty(_FogTint, "颜色");
+                            me.ShaderProperty(_FogOpacity, "不透明度");
+                            me.ShaderProperty(_FogRadius, "半径");
+                            me.ShaderProperty(_FogFade, "渐隐");
                         });
                         MGUI.ToggleGroupEnd();
                     });

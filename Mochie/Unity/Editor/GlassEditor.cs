@@ -1,4 +1,4 @@
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 using System;
 using System.Linq;
@@ -7,23 +7,23 @@ using System.Collections.Generic;
 using Mochie;
 
 namespace Mochie {
-        
+
     public class GlassEditor : ShaderGUI {
 
         public static Dictionary<Material, Toggles> foldouts = new Dictionary<Material, Toggles>();
         Toggles toggles = new Toggles(new string[] {
-            "Surface",
-            "Specularity",
-            "Emission",
-            "Rain",
-            "Lightmap Settings",
-            "Light Volumes",
+            "表面",
+            "高光",
+            "自发光",
+            "雨",
+            "光照贴图设置",
+            "光照体积",
             "LTCGI",
             "AreaLit",
-            "Render Settings"
+            "渲染设置"
         }, 1);
 
-        string versionLabel = "v1.15.2";
+        string versionLabel = "v1.15.2 | LGC 中文版 1.78.1";
 
         // Surface
         MaterialProperty _Workflow = null;
@@ -75,7 +75,7 @@ namespace Mochie {
         MaterialProperty _DynamicDroplets = null;
         MaterialProperty _RainThreshold = null;
         MaterialProperty _RainThresholdSize = null;
-        
+
         // Lightmap Settings
         MaterialProperty _LightmappedSpecularity = null;
         MaterialProperty _LightmapDistortion = null;
@@ -145,7 +145,7 @@ namespace Mochie {
                     property.SetValue(this, FindProperty(property.Name, props));
             }
             Material mat = (Material)me.target;
-            bool isTwoPass = mat.shader.name.Contains("(Two Pass)"); 
+            bool isTwoPass = mat.shader.name.Contains("(Two Pass)");
 
             if (!foldouts.ContainsKey(mat))
                 foldouts.Add(mat, toggles);
@@ -156,22 +156,22 @@ namespace Mochie {
                 SetBlendMode(mat);
             }
 
-            MGUI.DoHeader(isTwoPass ? "TWO PASS GLASS" : "GLASS");
+            MGUI.DoHeader(isTwoPass ? "双通道玻璃" : "玻璃");
 
             EditorGUI.BeginChangeCheck(); {
-                
+
                 // Surface
-                Foldouts.DoFoldout(foldouts, mat, "Surface", 1, Foldouts.Style.StandardButton);
+                Foldouts.DoFoldout(foldouts, mat, "表面", 1, Foldouts.Style.StandardButton);
                 if (Foldouts.DoFoldoutButton(MGUI.collapseLabel, 11)) Toggles.CollapseFoldouts(mat, foldouts, 1);
-                if (Foldouts.BeginFoldout(foldouts, mat, "Surface")) {
+                if (Foldouts.BeginFoldout(foldouts, mat, "表面")) {
                     MGUI.PropertyGroupParent(()=>{
                         MGUI.PropertyGroup(()=>{
                             me.ShaderProperty(_Workflow, Tips.workflowText);
-                            me.ShaderProperty(_BlendMode, "Transparency");
+                            me.ShaderProperty(_BlendMode, "透明度");
                             if (_BlendMode.floatValue == 0)
-                                me.ShaderProperty(_GrabpassTint, "Grabpass Tint");
-                            me.ShaderProperty(_SpecularityTint, "Specularity Tint");
-                            me.ShaderProperty(_BaseColorTint, "Base Color Tint");
+                                me.ShaderProperty(_GrabpassTint, "GrabPass 色调");
+                            me.ShaderProperty(_SpecularityTint, "高光色调");
+                            me.ShaderProperty(_BaseColorTint, "基础颜色色调");
                         });
                         MGUI.PropertyGroup(()=>{
                             me.TexturePropertySingleLine(Tips.baseColorLabel, _MainTex, _LitBaseColor);
@@ -190,8 +190,8 @@ namespace Mochie {
                                 MGUI.sRGBWarning(_OcclusionMap);
                                 MGUI.TextureSO(me, _OcclusionMap, _OcclusionMap.textureValue);
                                 bool hasAnyTexture = _OcclusionMap.textureValue != null || _RoughnessMap.textureValue != null || _MetallicMap.textureValue != null;
-                                if (hasAnyTexture && MGUI.PropertyButton("Pack Textures")){
-                                    Undo.RecordObjects(me.targets, "Pack Textures");
+                                if (hasAnyTexture && MGUI.PropertyButton("打包贴图")){
+                                    Undo.RecordObjects(me.targets, "打包贴图");
                                     bool allPacked = true;
                                     foreach (Material target in me.targets)
                                         allPacked &= PackPBRTextures(target);
@@ -219,9 +219,9 @@ namespace Mochie {
                         });
                         if (_Workflow.floatValue == 1){
                             MGUI.PropertyGroup(()=>{
-                                me.ShaderProperty(_MetallicChannel, "Metallic Channel");
-                                me.ShaderProperty(_RoughnessChannel, "Roughness Channel");
-                                me.ShaderProperty(_OcclusionChannel, "Occlusion Channel");
+                                me.ShaderProperty(_MetallicChannel, "金属度通道");
+                                me.ShaderProperty(_RoughnessChannel, "粗糙度通道");
+                                me.ShaderProperty(_OcclusionChannel, "环境光遮蔽通道");
                             });
                             MGUI.PropertyGroup(()=>{
                                 me.ShaderProperty(_PackedMetallicStrength, Tips.metallicPackedText);
@@ -231,8 +231,8 @@ namespace Mochie {
                         }
                         if (_BlendMode.floatValue == 0){
                             MGUI.PropertyGroup(()=>{
-                                me.ShaderProperty(_BlurQuality, "Blur Quality");
-                                me.ShaderProperty(_Blur, "Blur Strength");
+                                me.ShaderProperty(_BlurQuality, "模糊质量");
+                                me.ShaderProperty(_Blur, "模糊强度");
                                 me.ShaderProperty(_Refraction, Tips.normalRefractionText);
                                 if (!isTwoPass)
                                     MGUI.ToggleFloat(me, Tips.meshRefractionText, _RefractVertexNormal, _RefractionIOR);
@@ -243,7 +243,7 @@ namespace Mochie {
                 Foldouts.EndFoldout();
 
                 // Specularity
-                if (Foldouts.DoFoldout(foldouts, mat, "Specularity", Foldouts.Style.Standard)) {
+                if (Foldouts.DoFoldout(foldouts, mat, "高光", Foldouts.Style.Standard)) {
                     MGUI.PropertyGroupParent(()=>{
                         MGUI.PropertyGroup(()=>{
                             MGUI.ToggleFloat(me, Tips.cubemapReflectionsText, _ReflectionsToggle, _ReflectionStrength);
@@ -260,9 +260,9 @@ namespace Mochie {
                     });
                 }
                 Foldouts.EndFoldout();
-                
+
                 // Emission
-                if (Foldouts.DoFoldout(foldouts, mat, "Emission", Foldouts.Style.Standard)) {
+                if (Foldouts.DoFoldout(foldouts, mat, "自发光", Foldouts.Style.Standard)) {
                     MGUI.PropertyGroupParent(()=>{
                         MGUI.ToggleGroup(!me.EmissionEnabledProperty());
                         me.LightmapEmissionFlagsProperty(0, true);
@@ -270,14 +270,14 @@ namespace Mochie {
                         MGUI.PropertyGroup(()=>{
                             me.TexturePropertySingleLine(Tips.emissionText, _EmissionMap, _EmissionColor);
                             MGUI.TextureSO(me, _EmissionMap, _EmissionMap.textureValue);
-                            me.ShaderProperty(_EmissionStrength, "Strength");
+                            me.ShaderProperty(_EmissionStrength, "强度");
                             if (!isTwoPass)
-                                me.ShaderProperty(_EmissionParallaxDepth, "Parallax Offset");
+                                me.ShaderProperty(_EmissionParallaxDepth, "视差偏移");
                         });
                         if ((_BlendMode.floatValue == 1 || _BlendMode.floatValue == 2) && _EmissionParallaxDepth.floatValue > 0){
                             MGUI.PropertyGroup(()=>{
-                                me.ShaderProperty(_BlurQuality, "Blur Quality");
-                                me.ShaderProperty(_Blur, "Blur Strength");
+                                me.ShaderProperty(_BlurQuality, "模糊质量");
+                                me.ShaderProperty(_Blur, "模糊强度");
                             });
                         }
                          MGUI.ToggleGroupEnd();
@@ -286,7 +286,7 @@ namespace Mochie {
                 Foldouts.EndFoldout();
 
                 // Rain
-                if (Foldouts.DoFoldout(foldouts, mat, me, _RainMode, "Rain", Foldouts.Style.StandardToggle)) {
+                if (Foldouts.DoFoldout(foldouts, mat, me, _RainMode, "雨", Foldouts.Style.StandardToggle)) {
                     MGUI.PropertyGroupParent(()=>{
                         if (_RainMode.floatValue == 0 || _RainMode.floatValue == 1){
                             RainDroplets(me);
@@ -295,11 +295,11 @@ namespace Mochie {
                             RainRipples(me);
                         }
                         else if (_RainMode.floatValue == 3){
-                            MGUI.BoldLabel("Droplets");
+                            MGUI.BoldLabel("水滴");
                             RainDroplets(me);
-                            MGUI.BoldLabel("Ripples");
+                            MGUI.BoldLabel("涟漪");
                             RainRipples(me);
-                            MGUI.BoldLabel("Both");
+                            MGUI.BoldLabel("两者");
                             RainBoth(me);
                         }
                     });
@@ -307,17 +307,17 @@ namespace Mochie {
                 Foldouts.EndFoldout();
 
                 // Lightmap Settings
-                if (Foldouts.DoFoldout(foldouts, mat, "Lightmap Settings", Foldouts.Style.Standard)) {
+                if (Foldouts.DoFoldout(foldouts, mat, "光照贴图设置", Foldouts.Style.Standard)) {
                     MGUI.PropertyGroupParent(()=>{
                         MGUI.PropertyGroup(()=>{
                             me.ShaderProperty(_BakeryMode, Tips.bakeryMode);
-                            MGUI.ToggleFloat(me, "Bakery Specular Highlights", _BAKERY_LMSPEC, _BakeryLMSpecStrength);
+                            MGUI.ToggleFloat(me, "Bakery 高光", _BAKERY_LMSPEC, _BakeryLMSpecStrength);
                         });
                         MGUI.PropertyGroup(()=>{
                             me.ShaderProperty(_LightmappedSpecularity, Tips.lightmappedSpecularityText);
-                            me.ShaderProperty(_LightmapDistortion, "Lightmap UV Distortion");
-                            me.ShaderProperty(_IndirectStrength, "Lightmap Strength");
-                            me.ShaderProperty(_IndirectSaturation, "Lightmap Saturation");
+                            me.ShaderProperty(_LightmapDistortion, "光照贴图 UV 扭曲");
+                            me.ShaderProperty(_IndirectStrength, "光照贴图强度");
+                            me.ShaderProperty(_IndirectSaturation, "光照贴图饱和度");
                         });
                         MGUI.PropertyGroup(()=>{
                             me.ShaderProperty(_BicubicSampling, Tips.bicubicLightmap);
@@ -326,13 +326,13 @@ namespace Mochie {
                     });
                 }
                 Foldouts.EndFoldout();
-                
+
                 // Light Volumes
-                if (Foldouts.DoFoldout(foldouts, mat, me, _LightVolumesToggle, "Light Volumes", Foldouts.Style.StandardToggle)) {
+                if (Foldouts.DoFoldout(foldouts, mat, me, _LightVolumesToggle, "光照体积", Foldouts.Style.StandardToggle)) {
                     MGUI.ToggleGroup(_LightVolumesToggle.floatValue == 0);
                     MGUI.PropertyGroupParent(() => {
                         MGUI.PropertyGroup(() => {
-                            me.ShaderProperty(_LightVolumeStrength, "Strength");
+                            me.ShaderProperty(_LightVolumeStrength, "强度");
                             MGUI.ToggleFloat(me, Tips.additiveLightVolumeText, _AdditiveLightVolumesToggle, _AdditiveLightVolumeStrength);
                             MGUI.ToggleFloat(me, Tips.lightVolumeSpecText, _LightVolumeSpecularity, _LightVolumeSpecularityStrength);
                             me.ShaderProperty(_LightVolumeBias, Tips.lightVolumeBiasText);
@@ -348,9 +348,9 @@ namespace Mochie {
                         MGUI.PropertyGroupParent(()=>{
                             MGUI.ToggleGroup(_LTCGI.floatValue == 0);
                             MGUI.PropertyGroup(()=>{
-                                me.ShaderProperty(_LTCGIStrength, "Strength");
-                                me.ShaderProperty(_LTCGIRoughness, "Roughness Multiplier");
-                                me.ShaderProperty(_LTCGI_SpecularColor, "Tint");
+                                me.ShaderProperty(_LTCGIStrength, "强度");
+                                me.ShaderProperty(_LTCGIRoughness, "粗糙度倍率");
+                                me.ShaderProperty(_LTCGI_SpecularColor, "色调");
                             });
                             MGUI.ToggleGroupEnd();
                         });
@@ -371,8 +371,8 @@ namespace Mochie {
                             MGUI.PropertyGroup(()=>{
                                 me.TexturePropertySingleLine(Tips.maskText, _AreaLitMask);
                                 MGUI.TextureSO(me, _AreaLitMask, _AreaLitMask.textureValue);
-                                me.ShaderProperty(_AreaLitStrength, "Strength");
-                                me.ShaderProperty(_AreaLitRoughnessMult, "Roughness Multiplier");
+                                me.ShaderProperty(_AreaLitStrength, "强度");
+                                me.ShaderProperty(_AreaLitRoughnessMult, "粗糙度倍率");
                                 me.ShaderProperty(_OpaqueLights, Tips.opaqueLightsText);
                             });
                             MGUI.PropertyGroup(()=>{
@@ -389,7 +389,7 @@ namespace Mochie {
                                 me.TexturePropertySingleLine(Tips.lightTex3Text, _LightTex3);
                                 MGUI.CheckTrilinear(_LightTex3.textureValue, me);
                             });
-                            MGUI.DisplayInfo("Note that the AreaLit package files MUST be inside a folder named AreaLit (case sensitive) directly in the Assets folder (Assets/AreaLit)");
+                            MGUI.DisplayInfo("AreaLit 包文件必须位于 Assets 文件夹下直接创建的、名为 AreaLit 的文件夹中（区分大小写，路径为 Assets/AreaLit）。");
                             MGUI.ToggleGroupEnd();
                         });
                     }
@@ -402,7 +402,7 @@ namespace Mochie {
                 }
 
                 // Render Settings
-                if (Foldouts.DoFoldout(foldouts, mat, "Render Settings", Foldouts.Style.Standard)) {
+                if (Foldouts.DoFoldout(foldouts, mat, "渲染设置", Foldouts.Style.Standard)) {
                     MGUI.PropertyGroupParent(()=>{
                         MGUI.PropertyGroup(()=>{
                             me.ShaderProperty(_SamplingMode, Tips.samplingModeText);
@@ -410,15 +410,15 @@ namespace Mochie {
                             if (_TexCoordSpace.floatValue == 1f){
                                 me.ShaderProperty(_TexCoordSpaceSwizzle, Tips.swizzleText);
                             }
-                            me.ShaderProperty(_GlobalTexCoordScale, "Texture Coordinate Scale");
+                            me.ShaderProperty(_GlobalTexCoordScale, "贴图坐标缩放");
                         });
                         MGUI.PropertyGroup(()=>{
                             MGUI.SpaceN1();
                             _QueueOffset.floatValue = (int)_QueueOffset.floatValue;
-                            MGUI.DummyProperty("Render Queue:", mat.renderQueue.ToString());
+                            MGUI.DummyProperty("渲染队列：", mat.renderQueue.ToString());
                             me.ShaderProperty(_QueueOffset, Tips.queueOffset);
                             if (!isTwoPass)
-                                me.ShaderProperty(_Culling, "Culling Mode");
+                                me.ShaderProperty(_Culling, "剔除模式");
                         });
                     });
                 }
@@ -439,11 +439,11 @@ namespace Mochie {
                     me.TexturePropertySingleLine(Tips.maskText, _RainMask, _RainMaskChannel);
                     MGUI.TextureSO(me, _RainMask, _RainMask.textureValue);
                 }
-                me.ShaderProperty(_Strength, "Strength");
-                me.ShaderProperty(_Speed, "Speed");
-                me.ShaderProperty(_XScale, "X Scale");
-                me.ShaderProperty(_YScale, "Y Scale");
-                me.ShaderProperty(_DynamicDroplets, "Dynamic Droplets");
+                me.ShaderProperty(_Strength, "强度");
+                me.ShaderProperty(_Speed, "速度");
+                me.ShaderProperty(_XScale, "X 缩放");
+                me.ShaderProperty(_YScale, "Y 缩放");
+                me.ShaderProperty(_DynamicDroplets, "动态水滴");
             });
             MGUI.ToggleGroupEnd();
         }
@@ -454,11 +454,11 @@ namespace Mochie {
                     me.TexturePropertySingleLine(Tips.maskText, _RainMask, _RainMaskChannel);
                     MGUI.TextureSO(me, _RainMask, _RainMask.textureValue);
                 }
-                me.ShaderProperty(_RippleStrength, "Strength");
-                me.ShaderProperty(_RippleSpeed, "Speed");
-                me.ShaderProperty(_RippleScale, "Scale");
-                me.ShaderProperty(_RippleDensity, "Density");
-                me.ShaderProperty(_RippleSize, "Size");
+                me.ShaderProperty(_RippleStrength, "强度");
+                me.ShaderProperty(_RippleSpeed, "速度");
+                me.ShaderProperty(_RippleScale, "缩放");
+                me.ShaderProperty(_RippleDensity, "密度");
+                me.ShaderProperty(_RippleSize, "尺寸");
             });
         }
 
@@ -466,8 +466,8 @@ namespace Mochie {
             MGUI.PropertyGroup(()=>{
                 me.TexturePropertySingleLine(Tips.maskText, _RainMask, _RainMaskChannel);
                 MGUI.TextureSO(me, _RainMask, _RainMask.textureValue);
-                me.ShaderProperty(_RainThreshold, "Angle Threshold");
-                me.ShaderProperty(_RainThresholdSize, "Threshold Blend");
+                me.ShaderProperty(_RainThreshold, "角度阈值");
+                me.ShaderProperty(_RainThresholdSize, "阈值混合");
             });
         }
 
@@ -498,7 +498,7 @@ namespace Mochie {
 
         void SetKeywords(Material mat){
             bool isEmissive = (mat.globalIlluminationFlags & MaterialGlobalIlluminationFlags.EmissiveIsBlack) == 0;
-            bool isTwoPass = mat.shader.name.Contains("(Two Pass)"); 
+            bool isTwoPass = mat.shader.name.Contains("(Two Pass)");
             int rainMode = mat.GetInt("_RainMode");
             int blurMode = mat.GetInt("_BlurQuality");
             MGUI.SetKeyword(mat, "_EMISSION_ON", isEmissive);

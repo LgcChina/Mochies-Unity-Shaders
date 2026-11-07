@@ -1,4 +1,4 @@
-// A collection of UI functions I've developed over the years to improve customization of editor scripts
+﻿// A collection of UI functions I've developed over the years to improve customization of editor scripts
 // Full of lots of garbage duplicate stuff I'm too lazy to clean out
 // By Mochie#8794
 
@@ -13,7 +13,7 @@ using System.Globalization;
 
 namespace Mochie {
     public static class MGUI {
-        
+
         public static Texture2D resetIcon = (Texture2D)Resources.Load("ResetIcon", typeof(Texture2D));
         public static Texture2D collapseIcon = (Texture2D)Resources.Load("CollapseIcon", typeof(Texture2D));
         public static Texture2D mochieLogo = (Texture2D)Resources.Load("MochieLogo", typeof(Texture2D));
@@ -21,9 +21,9 @@ namespace Mochie {
         public static Texture2D mochieLogoPro = (Texture2D)Resources.Load("MochieLogo_Pro", typeof(Texture2D));
         public static Texture2D patIconTex = (Texture2D)Resources.Load("Patreon_Icon", typeof(Texture2D));
         public static Texture2D cheeseIconTex = (Texture2D)Resources.Load("Cheese_Icon", typeof(Texture2D));
-        public static GUIContent collapseLabel = new GUIContent(collapseIcon, "Collapse all foldout tabs.");
-        public static GUIContent resetLabel = new GUIContent(resetIcon, "Reset all properties in this tab to their default values.");
-        public static GUIContent docsLabel = new GUIContent("Documentation", "Open this shader's documentation in your browser.");
+        public static GUIContent collapseLabel = new GUIContent(collapseIcon, "折叠所有可折叠区域。");
+        public static GUIContent resetLabel = new GUIContent(resetIcon, "将此选项卡中的所有属性重置为其默认值。");
+        public static GUIContent docsLabel = new GUIContent("文档", "在浏览器中打开此着色器的文档。");
         public const string docsURL = "https://github.com/MochiesCode/Mochies-Unity-Shaders/wiki";
 
         public static List<T> FindAssetsByType<T>() where T : UnityEngine.Object {
@@ -55,7 +55,7 @@ namespace Mochie {
                 }
             }
         }
-        
+
         public static void ClearKeywords(Material mat){
             foreach (string s in mat.shaderKeywords){
                 mat.DisableKeyword(s);
@@ -77,7 +77,7 @@ namespace Mochie {
         public static bool IsLiteVersion(Material mat){
             return mat.shader.name.Contains("(Lite)");
         }
-        
+
         public static bool IsNewLiteVersion(Material mat){
             return mat.shader.name.Contains("Lite");
         }
@@ -125,7 +125,7 @@ namespace Mochie {
                 }
             }
         }
-        
+
         public static void DoHeader(string header){
             Rect headerRect = EditorGUILayout.GetControlRect();
             headerRect.x -= 10f;
@@ -168,12 +168,12 @@ namespace Mochie {
             GUI.Label(versionRect, versionLabel, formatting);
             buttonRect.x += buttonSize;
             if (GUI.Button(buttonRect, MGUI.cheeseIconTex)){
-                string patrons = "Thank you for your support, past and present!\n";
+                string patrons = "感谢您过去和现在的支持！\n";
                 foreach (string s in cheeseList){
                     patrons += "\n" + s;
                 }
-                patrons += "\n\nPlease note that names are not removed from this list, so it does not reflect any individual user's current patreon subscription status.";
-                EditorUtility.DisplayDialog("Skyrim Cheese Wheel Hall of Fame", patrons, "Close");
+                patrons += "\n\n请注意，姓名不会从此列表中删除，因此它不会反映任何个人用户当前的 patreon 订阅状态​​。";
+                EditorUtility.DisplayDialog("天际奶酪轮名人堂", patrons, "关闭");
             }
             Vector2 docsSize = EditorStyles.linkLabel.CalcSize(docsLabel);
             Rect docsRect = new Rect(centerX-docsSize.x*0.5f, buttonRect.y+buttonSize+8f, docsSize.x, docsSize.y);
@@ -196,7 +196,7 @@ namespace Mochie {
             EditorGUILayout.HelpBox(message, MessageType.Info);
             Space2();
         }
-        
+
         public static void DisplayText(string message){
             EditorGUILayout.HelpBox(message, MessageType.None);
             Space2();
@@ -212,7 +212,7 @@ namespace Mochie {
 
         public static void MaskProperty(Material mat, MaterialEditor me, bool display, MaterialProperty mask, MaterialProperty scroll){
             if (display){
-                me.TexturePropertySingleLine(new GUIContent("Mask Texture"), mask);
+                me.TexturePropertySingleLine(new GUIContent("遮罩贴图"), mask);
                 TextureSOScroll(me, mask, scroll, mask.textureValue);
                 MGUI.Space4();
             }
@@ -258,9 +258,9 @@ namespace Mochie {
         public static bool PropertyButton(String label){
             return SimpleButton(label, GetPropertyWidth(), EditorGUIUtility.labelWidth);
         }
-        
+
         public static bool ResetButton(){
-            return SimpleButton("Reset", GetPropertyWidth(), EditorGUIUtility.labelWidth);
+            return SimpleButton("重置", GetPropertyWidth(), EditorGUIUtility.labelWidth);
         }
 
         public static void DoResetButton(MaterialProperty vec0, MaterialProperty vec1, Vector4 default0, Vector4 default1){
@@ -315,7 +315,7 @@ namespace Mochie {
 
         public static void ResetProperty(MaterialProperty prop){
             if (prop == null || prop.targets == null || prop.targets.Length == 0) return;
-            Undo.RecordObjects(prop.targets, "Reset " + prop.displayName);
+            Undo.RecordObjects(prop.targets, "重置 " + prop.displayName);
             foreach (var target in prop.targets){
                 Material mat = target as Material;
                 if (mat == null || mat.shader == null) continue;
@@ -373,7 +373,7 @@ namespace Mochie {
             if (prop == null || prop.targets == null || prop.targets.Length == 0) return;
             string clip = EditorGUIUtility.systemCopyBuffer;
             if (string.IsNullOrEmpty(clip)) return;
-            Undo.RecordObjects(prop.targets, "Paste " + prop.displayName);
+            Undo.RecordObjects(prop.targets, "粘贴 " + prop.displayName);
             switch (prop.type){
                 case MaterialProperty.PropType.Float:
                 case MaterialProperty.PropType.Range:
@@ -466,7 +466,7 @@ namespace Mochie {
 
             if (isAnyOverridden && firstMat != null){
                 if (firstMat.parent != null){
-                    menu.AddItem(new GUIContent("Apply to Material '" + firstMat.parent.name + "'"), false, () => {
+                    menu.AddItem(new GUIContent("应用于材质 '" + firstMat.parent.name + "'"), false, () => {
                         foreach (var p in allProps){
                             if (p != null && p.targets != null){
                                 foreach (var t in p.targets){
@@ -478,7 +478,7 @@ namespace Mochie {
                         }
                     });
                 }
-                menu.AddItem(new GUIContent("Revert"), false, () => {
+                menu.AddItem(new GUIContent("还原"), false, () => {
                     foreach (var p in allProps){
                         if (p != null && p.targets != null){
                             foreach (var t in p.targets){
@@ -494,20 +494,20 @@ namespace Mochie {
 
             // Copy
             if (copyProp != null)
-                menu.AddItem(new GUIContent("Copy"), false, () => CopyProperty(copyProp));
+                menu.AddItem(new GUIContent("复制"), false, () => CopyProperty(copyProp));
             else
-                menu.AddDisabledItem(new GUIContent("Copy"));
+                menu.AddDisabledItem(new GUIContent("复制"));
 
             // Paste
             if (copyProp != null && CanPasteProperty(copyProp))
-                menu.AddItem(new GUIContent("Paste"), false, () => PasteProperty(copyProp));
+                menu.AddItem(new GUIContent("粘贴"), false, () => PasteProperty(copyProp));
             else
-                menu.AddDisabledItem(new GUIContent("Paste"));
+                menu.AddDisabledItem(new GUIContent("粘贴"));
 
             menu.AddSeparator("");
 
             // Reset (Resets ALL properties in the function)
-            menu.AddItem(new GUIContent("Reset"), false, () => {
+            menu.AddItem(new GUIContent("重置"), false, () => {
                 foreach (var p in allProps){
                     if (p != null)
                         ResetProperty(p);
@@ -532,10 +532,10 @@ namespace Mochie {
             }
 
             bool newLock = !isAnyLocked;
-            menu.AddItem(new GUIContent("Lock in children"), isAnyLocked, () => {
+            menu.AddItem(new GUIContent("锁定子材质"), isAnyLocked, () => {
                 foreach (var p in allProps){
                     if (p != null && p.targets != null){
-                        Undo.RecordObjects(p.targets, (newLock ? "Lock " : "Unlock ") + p.displayName);
+                        Undo.RecordObjects(p.targets, (newLock ? "锁定 " : "解锁 ") + p.displayName);
                         foreach (var t in p.targets){
                             Material m = t as Material;
                             if (m != null)
@@ -634,7 +634,7 @@ namespace Mochie {
             if (slider != null) MaterialEditor.EndProperty();
             if (toggle != null) MaterialEditor.EndProperty();
         }
-        
+
         public static void CustomToggleSlider(string label, MaterialProperty toggle, MaterialProperty value, float min, float max){
             CustomToggleSlider(new GUIContent(label), toggle, value, min, max);
         }
@@ -948,7 +948,7 @@ namespace Mochie {
         public static void SliderMinMax01(MaterialProperty minRange, MaterialProperty maxRange, GUIContent label, int groupLayers){
             DoMinMaxSlider(minRange, maxRange, 0f, 1f, label, groupLayers);
         }
-        
+
         private static void DoMinMaxSlider(MaterialProperty minRange, MaterialProperty maxRange, float minLimit, float maxLimit, GUIContent label, int groupLayers){
             float offset0 = 0f;
             switch (groupLayers){
@@ -1037,7 +1037,7 @@ namespace Mochie {
             GUILayout.Space(upperMargin);
             Rect r = EditorGUILayout.GetControlRect();
             r.x = iw/2.0f;
-            
+
             GUI.Label(r, text, f);
         }
 
@@ -1098,14 +1098,14 @@ namespace Mochie {
         public static void TextureSOScroll(MaterialEditor me, MaterialProperty tex, MaterialProperty vec){
             me.TextureScaleOffsetProperty(tex);
             SpaceN2();
-            Vector2Field(vec, "Scrolling");
+            Vector2Field(vec, "滚动");
         }
 
         public static void TextureSOScroll(MaterialEditor me, MaterialProperty tex, MaterialProperty vec, bool shouldDisplay){
             if (shouldDisplay){
                 me.TextureScaleOffsetProperty(tex);
                 SpaceN2();
-                Vector2Field(vec, "Scrolling");
+                Vector2Field(vec, "滚动");
             }
         }
 
@@ -1118,7 +1118,7 @@ namespace Mochie {
 
         // Shorthand for displaying an error window
         public static void ErrorBox(string message){
-            EditorUtility.DisplayDialog("Error", message, "Close");
+            EditorUtility.DisplayDialog("错误", message, "关闭");
         }
 
         public static void PropertyGroup(Action action){
@@ -1150,7 +1150,7 @@ namespace Mochie {
 
         // Replace invalid windows characters with underscores
         public static string ReplaceInvalidChars(string filename) {
-            string updated = string.Join("_", filename.Split(Path.GetInvalidFileNameChars())); 
+            string updated = string.Join("_", filename.Split(Path.GetInvalidFileNameChars()));
             updated = updated.Replace(" ", "_");
             if (updated == "")
                 updated = "_";
@@ -1172,7 +1172,7 @@ namespace Mochie {
         public static void BoldLabel(GUIContent text){
             EditorGUILayout.LabelField(text);
         }
-        
+
         public static void Label(string text){
             EditorGUILayout.LabelField(text);
         }
@@ -1187,7 +1187,7 @@ namespace Mochie {
                 alignment = TextAnchor.MiddleRight
             }, GUILayout.Height(24));
             EditorGUILayout.Space();
-            bool buttonPress = GUILayout.Button("Fix Now", new GUIStyle("button") {
+            bool buttonPress = GUILayout.Button("立即修复", new GUIStyle("button") {
                 stretchWidth = false,
                 margin = new RectOffset(0, 0, 0, 0),
                 padding = new RectOffset(8, 8, 0, 0)
@@ -1200,7 +1200,7 @@ namespace Mochie {
 
         public static void sRGBWarning(MaterialProperty tex){
             if (tex.textureValue){
-                string warningText = "This texture is marked as sRGB, but should be linear.";
+                string warningText = "该贴图标记为 sRGB，但应该是线性的。";
                 string texPath = AssetDatabase.GetAssetPath(tex.textureValue);
                 TextureImporter texImporter;
                 var importer = TextureImporter.GetAtPath(texPath) as TextureImporter;
@@ -1218,7 +1218,7 @@ namespace Mochie {
 
         public static void NormalWarning(MaterialProperty tex){
             if (tex.textureValue){
-                string warningText = "This texture is not marked as a normal map.";
+                string warningText = "该贴图未标记为法线贴图。";
                 string texPath = AssetDatabase.GetAssetPath(tex.textureValue);
                 TextureImporter texImporter;
                 var importer = TextureImporter.GetAtPath(texPath) as TextureImporter;
@@ -1239,14 +1239,14 @@ namespace Mochie {
                 return;
             if(tex.mipmapCount <= 1) {
                 me.HelpBoxWithButton(
-                    EditorGUIUtility.TrTextContent("Mip maps are required, please enable them in the texture import settings."),
-                    EditorGUIUtility.TrTextContent("OK"));
+                    EditorGUIUtility.TrTextContent("需要 Mip 贴图，请在贴图导入设置中启用它们。"),
+                    EditorGUIUtility.TrTextContent("确定"));
                 return;
             }
             if(tex.filterMode != FilterMode.Trilinear) {
                 if(me.HelpBoxWithButton(
-                    EditorGUIUtility.TrTextContent("Trilinear filtering is required, and aniso is recommended."),
-                    EditorGUIUtility.TrTextContent("Fix Now"))) {
+                    EditorGUIUtility.TrTextContent("需要三线性过滤，建议启用各向异性过滤。"),
+                    EditorGUIUtility.TrTextContent("立即修复"))) {
                     tex.filterMode = FilterMode.Trilinear;
                     tex.anisoLevel = 1;
                     EditorUtility.SetDirty(tex);
@@ -1276,13 +1276,13 @@ namespace Mochie {
             EditorGUI.BeginChangeCheck();
 
             int intValue = prop != null ? prop.intValue : 0;
-            
+
             // a generic enum parameter can't be directly casted to an int,
             // so this is the most performant option (rather than casting
             // to object first, which would allocate some garbage)
-            
+
             T enumValue = (T)Enum.ToObject(typeof(T), intValue);
-            
+
             if (typeof(T).GetCustomAttribute<FlagsAttribute>() != null)
                 enumValue = (T)EditorGUI.EnumFlagsField(r, label, enumValue);
             else

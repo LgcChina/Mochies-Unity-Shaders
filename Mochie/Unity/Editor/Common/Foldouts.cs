@@ -32,7 +32,7 @@ namespace Mochie {
                 case Style.Thin: state = FoldoutThin(header, toggles.GetState(index)); break;
                 case Style.ThinShort: state = FoldoutThinShort(header, toggles.GetState(index)); break;
                 case Style.ThinLong: state = FoldoutThinLong(header, toggles.GetState(index)); break;
-                default: MGUI.DisplayError("INVALID STYLE SELECTION"); break;
+                default: MGUI.DisplayError("样式选择无效"); break;
             }
 
             toggles.SetState(index, state);
@@ -48,7 +48,7 @@ namespace Mochie {
                 case Style.ThinToggle: state = FoldoutThinToggle(header, toggles.GetState(index), me, toggleProp); break;
                 case Style.ThinShortToggle: state = FoldoutThinShortToggle(header, toggles.GetState(index), me, toggleProp); break;
                 case Style.ThinLongToggle: state = FoldoutThinLongToggle(header, toggles.GetState(index), me, toggleProp); break;
-                default: MGUI.DisplayError("INVALID STYLE SELECTION"); break;
+                default: MGUI.DisplayError("样式选择无效"); break;
             }
 
             toggles.SetState(index, state);
@@ -62,7 +62,7 @@ namespace Mochie {
             bool state = false;
             switch(style){
                 case Style.StandardButton: state = FoldoutButton(header, toggles.GetState(index), buttonCount); break;
-                default: MGUI.DisplayError("INVALID STYLE SELECTION"); break;
+                default: MGUI.DisplayError("样式选择无效"); break;
             }
 
             toggles.SetState(index, state);
@@ -322,6 +322,6 @@ namespace Mochie {
             MGUI.SpaceN20();
             return display;
         }
-        
+
     }
 }

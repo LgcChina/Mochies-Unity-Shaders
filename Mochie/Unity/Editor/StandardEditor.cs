@@ -1,34 +1,34 @@
-using System.IO;
+﻿using System.IO;
 using UnityEditor;
 using UnityEngine;
 using System.Reflection;
 using System.Collections.Generic;
 
 namespace Mochie {
-    
+
     public class StandardEditor : ShaderGUI, IPostMaterialUpgradeCallback {
 
         public static Dictionary<Material, Toggles> foldouts = new Dictionary<Material, Toggles>();
         Toggles toggles = new Toggles(new string[] {
-            "Shader Variant",
-            "Primary Textures",
-            "Detail Textures",
-            "Specularity",
-            "Vertex Manipulation",
-            "Subsurface Scattering",
-            "Rain",
-            "Puddles",
-            "Filtering",
-            "Extra UVs",
-            "Light Volumes",
+            "着色器变体",
+            "主贴图",
+            "细节贴图",
+            "高光",
+            "顶点操作",
+            "次表面散射",
+            "雨",
+            "水坑",
+            "滤镜",
+            "额外 UV",
+            "光照体积",
             "AreaLit",
             "LTCGI",
-            "Lightmap Settings",
-            "Render Settings",
-            "Debug"
+            "光照贴图设置",
+            "渲染设置",
+            "调试"
         }, 3);
-        
-        string versionLabel = "v2.14.2";
+
+        string versionLabel = "v2.14.2 | LGC 中文版 1.78.1";
 
         // Variant Settings
         MaterialProperty _BlendMode = null;
@@ -212,7 +212,7 @@ namespace Mochie {
         MaterialProperty _WindSmoothness0 = null;
         MaterialProperty _WindSmoothness1 = null;
         MaterialProperty _WindSmoothness2 = null;
-        
+
         // Subsurface Scattering
         MaterialProperty _Subsurface = null;
         MaterialProperty _ThicknessMap = null;
@@ -221,7 +221,7 @@ namespace Mochie {
         MaterialProperty _ScatterAmbient = null;
         MaterialProperty _ScatterIntensity = null;
         MaterialProperty _ScatterPow = null;
-        MaterialProperty _ScatterDist = null; 
+        MaterialProperty _ScatterDist = null;
         MaterialProperty _WrappingFactor = null;
         MaterialProperty _ScatterBaseColorTint = null;
 
@@ -248,7 +248,7 @@ namespace Mochie {
         MaterialProperty _SaturationEmiss = null;
         MaterialProperty _BrightnessEmiss = null;
         MaterialProperty _ContrastEmiss = null;
-        
+
         // Rain
         MaterialProperty _RainMode = null;
         MaterialProperty _UVRainSet = null;
@@ -365,7 +365,7 @@ namespace Mochie {
         #region OnGUI
         public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] props) {
             me = materialEditor;
-            
+
             if (!me.isVisible)
                 return;
 
@@ -398,9 +398,9 @@ namespace Mochie {
 
             isHeightmapped = (_PrimaryWorkflow.floatValue == 1 && _PackedHeight.floatValue == 1) || (_PrimaryWorkflow.floatValue != 1 && _HeightMap.textureValue);
 
-            string headerText = "STANDARD";
-            if (MGUI.IsNewLiteVersion(mat)) headerText += " LITE";
-            if (MGUI.IsMobileVersion(mat)) headerText += " MOBILE";
+            string headerText = "标准";
+            if (MGUI.IsNewLiteVersion(mat)) headerText += " 精简版";
+            if (MGUI.IsMobileVersion(mat)) headerText += " 移动版";
             MGUI.DoHeader(headerText);
 
             EditorGUI.BeginChangeCheck(); {
@@ -440,9 +440,9 @@ namespace Mochie {
 
         #region Variant Settings
         void DoVariant(Material mat, bool isLite, bool isMobile){
-            Foldouts.DoFoldout(foldouts, mat, "Shader Variant", 1, Foldouts.Style.StandardButton);
+            Foldouts.DoFoldout(foldouts, mat, "着色器变体", 1, Foldouts.Style.StandardButton);
             if (Foldouts.DoFoldoutButton(MGUI.collapseLabel, 11)) Toggles.CollapseFoldouts(mat, foldouts, 4);
-            if (Foldouts.BeginFoldout(foldouts, mat, "Shader Variant")) {
+            if (Foldouts.BeginFoldout(foldouts, mat, "着色器变体")) {
                 MGUI.PropertyGroupParent(()=>{
                     MGUI.PropertyGroup(()=>{
                         me.ShaderProperty(_ShadingModel, Tips.shadingModelText);
@@ -458,25 +458,25 @@ namespace Mochie {
                                     me.ShaderProperty(_PackedHeight, Tips.packedHeightText);
                                 }
                                 else if (_PrimaryWorkflow.floatValue == 2){
-                                    me.ShaderProperty(_SmoothnessSource, _SmoothnessToggle.floatValue == 0 ? "Roughness Source" : "Smoothness Source");
+                                    me.ShaderProperty(_SmoothnessSource, _SmoothnessToggle.floatValue == 0 ? "粗糙度来源" : "平滑度来源");
                                 }
                             }
                         }
                         me.ShaderProperty(_SmoothnessToggle, Tips.smoothnessModeText);
                         if (_PrimarySampleMode.floatValue == 3 || (_DetailSampleMode.floatValue == 3 && !isLite))
-                            me.ShaderProperty(_TriplanarCoordSpace, "Triplanar Coordinates");
+                            me.ShaderProperty(_TriplanarCoordSpace, "三平面坐标");
                     });
                     if (_BlendMode.floatValue == 1){
                         MGUI.PropertyGroup(()=>{
                             me.ShaderProperty(_MipMapRescaling, Tips.mipRescalingText);
                             if (_MipMapRescaling.floatValue == 1){
-                                me.ShaderProperty(_MipMapScale, "Mip Map Scale");
+                                me.ShaderProperty(_MipMapScale, "Mip 贴图缩放");
                             }
                             me.ShaderProperty(_Cutoff, Tips.alphaCutoffText);
                         });
                     }
                     if (_BlendMode.floatValue == 1 && isMobile){
-                        MGUI.DisplayWarning("Please note that cutout can be EXTREMELY expensive on mobile platforms, and it is HIGHLY recommended to avoid using it there.");
+                        MGUI.DisplayWarning("请注意，镂空效果在移动平台上可能产生较高的性能开销，强烈建议不要在移动平台上使用。");
                         MGUI.Space2();
                     }
                 });
@@ -487,7 +487,7 @@ namespace Mochie {
 
         #region Primary Tex
         void DoPrimaryTextures(Material mat, bool isLite, bool isMobile){
-            if (Foldouts.DoFoldout(foldouts, mat, "Primary Textures", Foldouts.Style.Standard)) {
+            if (Foldouts.DoFoldout(foldouts, mat, "主贴图", Foldouts.Style.Standard)) {
                 MGUI.PropertyGroupParent(()=>{
                     if (!isLite){
                         MGUI.PropertyGroup(()=>{
@@ -497,7 +497,7 @@ namespace Mochie {
                                 me.ShaderProperty(_PackedHeight, Tips.packedHeightText);
                             }
                             else if (_PrimaryWorkflow.floatValue == 2){
-                                me.ShaderProperty(_SmoothnessSource, _SmoothnessToggle.floatValue == 0 ? "Roughness Source" : "Smoothness Source");
+                                me.ShaderProperty(_SmoothnessSource, _SmoothnessToggle.floatValue == 0 ? "粗糙度来源" : "平滑度来源");
                             }
                         });
                     }
@@ -525,14 +525,14 @@ namespace Mochie {
                                     me.ShaderProperty(_HeightOffset, Tips.heightOffsetText);
                                     me.ShaderProperty(_HeightFalloff, Tips.heightFalloffText);
                                     if (_HeightFalloff.floatValue == 1) {
-                                        me.ShaderProperty(_HeightMinRange, "Min Range");
-                                        me.ShaderProperty(_HeightMaxRange, "Max Range");
+                                        me.ShaderProperty(_HeightMinRange, "最小范围");
+                                        me.ShaderProperty(_HeightMaxRange, "最大范围");
                                     }
                                 }
                             }
                             bool hasAnyTexture = _OcclusionMap.textureValue != null || _RoughnessMap.textureValue != null || _MetallicMap.textureValue != null || _HeightMap.textureValue != null;
-                            if (hasAnyTexture && MGUI.PropertyButton("Pack Textures")){
-                                Undo.RecordObjects(me.targets, "Pack Textures");
+                            if (hasAnyTexture && MGUI.PropertyButton("打包贴图")){
+                                Undo.RecordObjects(me.targets, "打包贴图");
                                 bool allPacked = true;
                                 foreach (Material target in me.targets)
                                     allPacked &= PackPrimaryTextures(target);
@@ -583,8 +583,8 @@ namespace Mochie {
                                     me.ShaderProperty(_HeightOffset, Tips.heightOffsetText);
                                     me.ShaderProperty(_HeightFalloff, Tips.heightFalloffText);
                                     if (_HeightFalloff.floatValue == 1) {
-                                        me.ShaderProperty(_HeightMinRange, "Min Range");
-                                        me.ShaderProperty(_HeightMaxRange, "Max Range");
+                                        me.ShaderProperty(_HeightMinRange, "最小范围");
+                                        me.ShaderProperty(_HeightMaxRange, "最大范围");
                                     }
                                 }
                             }
@@ -593,11 +593,11 @@ namespace Mochie {
                     });
                     if (_PrimaryWorkflow.floatValue == 1){
                         MGUI.PropertyGroup(()=>{
-                            me.ShaderProperty(_MetallicChannel, "Metallic Channel");
-                            me.ShaderProperty(_RoughnessChannel, _SmoothnessToggle.floatValue == 0 ? "Roughness Channel" : "Smoothness Channel");
-                            me.ShaderProperty(_OcclusionChannel, "Occlusion Channel");
+                            me.ShaderProperty(_MetallicChannel, "金属度通道");
+                            me.ShaderProperty(_RoughnessChannel, _SmoothnessToggle.floatValue == 0 ? "粗糙度通道" : "平滑度通道");
+                            me.ShaderProperty(_OcclusionChannel, "环境光遮蔽通道");
                             if (_PackedHeight.floatValue == 1 && _PrimarySampleMode.floatValue != 3 && !isMobile){
-                                me.ShaderProperty(_HeightChannel, "Height Channel");
+                                me.ShaderProperty(_HeightChannel, "高度通道");
                             }
                         });
                         MGUI.PropertyGroup(()=>{
@@ -618,7 +618,7 @@ namespace Mochie {
                                 me.ShaderProperty(_UVMainSwizzle, Tips.swizzleText);
                             }
                             MGUI.TextureSOScroll(me, _MainTex, _UVMainScroll);
-                            me.ShaderProperty(_UVMainRotation, "Rotation");
+                            me.ShaderProperty(_UVMainRotation, "旋转");
                         }
                         else {
                             MGUI.TextureSO(me, _MainTex);
@@ -648,11 +648,11 @@ namespace Mochie {
                     me.ShaderProperty(_AudioLinkEmission, Tips.audioLinkEmission);
                     if (_AudioLinkEmission.floatValue > 0){
                         me.ShaderProperty(_AudioLinkEmissionStrength, Tips.audioLinkEmissionStrength);
-                        MGUI.SliderMinMax(_AudioLinkMin, _AudioLinkMax, 0f, 2f, "Remap", 0);
+                        MGUI.SliderMinMax(_AudioLinkMin, _AudioLinkMax, 0f, 2f, "重映射", 0);
                         me.ShaderProperty(_AudioLinkEmissionMeta, Tips.audioLinkEmissionMeta);
                     }
                     MGUI.Space4();
-                    
+
                     me.TexturePropertySingleLine(Tips.emissionText, _EmissionMap, _EmissionColor, _EmissionStrength);
                     if (!isMobile)
                         me.TexturePropertySingleLine(Tips.maskText, _EmissionMask, _EmissionMask.textureValue ? _EmissionMaskChannel : null);
@@ -670,7 +670,7 @@ namespace Mochie {
 
         #region Detail Tex
         void DoDetailTextures(Material mat){
-            if (Foldouts.DoFoldout(foldouts, mat, "Detail Textures", Foldouts.Style.Standard)) {
+            if (Foldouts.DoFoldout(foldouts, mat, "细节贴图", Foldouts.Style.Standard)) {
                 MGUI.PropertyGroupParent(()=>{
                     MGUI.PropertyGroup(()=>{
                         me.ShaderProperty(_DetailWorkflow, Tips.workflowText);
@@ -678,7 +678,7 @@ namespace Mochie {
                     });
                     MGUI.PropertyGroup(()=>{
                         if (_DetailMainTex.textureValue){
-                            me.ShaderProperty(_DetailColor, "Detail Tint");
+                            me.ShaderProperty(_DetailColor, "细节色调");
                             MGUI.Space4();
                         }
                         me.TexturePropertySingleLine(Tips.detailAlbedoText, _DetailMainTex, _DetailMainTex.textureValue ? _DetailMainTexStrength : null, _DetailMainTex.textureValue ? _DetailMainTexBlend : null);
@@ -699,8 +699,8 @@ namespace Mochie {
                         if (_DetailWorkflow.floatValue == 0){
                             me.TexturePropertySingleLine(Tips.detailMaskText, _DetailMask, _DetailMask.textureValue ? _DetailMaskChannel : null, _DetailMask.textureValue ? _DetailMaskMode : null);
                             bool hasAnyTexture = _DetailOcclusionMap.textureValue != null || _DetailRoughnessMap.textureValue != null || _DetailMetallicMap.textureValue != null;
-                            if (hasAnyTexture && MGUI.PropertyButton("Pack Textures")){
-                                Undo.RecordObjects(me.targets, "Pack Textures");
+                            if (hasAnyTexture && MGUI.PropertyButton("打包贴图")){
+                                Undo.RecordObjects(me.targets, "打包贴图");
                                 bool allPacked = true;
                                 foreach (Material target in me.targets)
                                     allPacked &= PackDetailTextures(target);
@@ -719,15 +719,15 @@ namespace Mochie {
                     });
                     if (_DetailWorkflow.floatValue == 1){
                         MGUI.PropertyGroup(()=>{
-                            me.ShaderProperty(_DetailMetallicChannel, "Metallic Channel");
-                            me.ShaderProperty(_DetailRoughnessChannel, _SmoothnessToggle.floatValue == 0 ? "Roughness Channel" : "Smoothness Channel");
-                            me.ShaderProperty(_DetailOcclusionChannel, "Occlusion Channel");
+                            me.ShaderProperty(_DetailMetallicChannel, "金属度通道");
+                            me.ShaderProperty(_DetailRoughnessChannel, _SmoothnessToggle.floatValue == 0 ? "粗糙度通道" : "平滑度通道");
+                            me.ShaderProperty(_DetailOcclusionChannel, "环境光遮蔽通道");
                         });
                         if (_DetailMaskMode.floatValue == 0){
                             MGUI.PropertyGroup(()=>{
-                                me.ShaderProperty(_DetailMetallicBlend, "Metallic Blend");
-                                me.ShaderProperty(_DetailRoughnessBlend, "Roughness Blend");
-                                me.ShaderProperty(_DetailOcclusionBlend, "Occlusion Blend");
+                                me.ShaderProperty(_DetailMetallicBlend, "金属度混合");
+                                me.ShaderProperty(_DetailRoughnessBlend, "粗糙度混合");
+                                me.ShaderProperty(_DetailOcclusionBlend, "环境光遮蔽混合");
                             });
                         }
                         MGUI.PropertyGroup(()=>{
@@ -744,7 +744,7 @@ namespace Mochie {
                                     me.ShaderProperty(_UVDetailSwizzle, Tips.swizzleText);
                                 }
                                 MGUI.TextureSOScroll(me, _DetailMainTex, _UVDetailScroll);
-                                me.ShaderProperty(_UVDetailRotation, "Rotation");
+                                me.ShaderProperty(_UVDetailRotation, "旋转");
                             }
                             else {
                                 MGUI.TextureSO(me, _DetailMainTex);
@@ -822,11 +822,11 @@ namespace Mochie {
 
         #region Detail Tex Lite
         void DoDetailTexturesLite(Material mat){
-            if (Foldouts.DoFoldout(foldouts, mat, "Detail Textures", Foldouts.Style.Standard)) {
+            if (Foldouts.DoFoldout(foldouts, mat, "细节贴图", Foldouts.Style.Standard)) {
                 MGUI.PropertyGroupParent(()=>{
                     MGUI.PropertyGroup(()=>{
                         if (_DetailMainTex.textureValue){
-                            me.ShaderProperty(_DetailColor, "Detail Tint");
+                            me.ShaderProperty(_DetailColor, "细节色调");
                             MGUI.Space4();
                         }
                         me.TexturePropertySingleLine(Tips.detailAlbedoText, _DetailMainTex, _DetailMainTex.textureValue ? _DetailMainTexStrength : null, _DetailMainTex.textureValue && _DetailMaskMode.floatValue != 1 ? _DetailMainTexBlend : null);
@@ -840,7 +840,7 @@ namespace Mochie {
                                 me.ShaderProperty(_UVDetailSwizzle, Tips.swizzleText);
                             }
                             MGUI.TextureSOScroll(me, _DetailMainTex, _UVDetailScroll);
-                            me.ShaderProperty(_UVDetailRotation, "Rotation");
+                            me.ShaderProperty(_UVDetailRotation, "旋转");
                         });
                     }
                 });
@@ -851,7 +851,7 @@ namespace Mochie {
 
         #region Specularity
         void DoSpecularity(Material mat, bool isLite){
-            if (Foldouts.DoFoldout(foldouts, mat, "Specularity", Foldouts.Style.Standard)) {
+            if (Foldouts.DoFoldout(foldouts, mat, "高光", Foldouts.Style.Standard)) {
                 MGUI.PropertyGroupParent(()=>{
                     MGUI.PropertyGroup(()=>{
                         MGUI.ToggleFloat(me, Tips.specularHighlightsText, _SpecularHighlightsToggle, _SpecularHighlightStrength);
@@ -862,7 +862,7 @@ namespace Mochie {
                                 MGUI.PropertyGroup(()=>{
                                     me.ShaderProperty(_SSREdgeFade, Tips.ssrEdgeFadeText);
                                     me.ShaderProperty(_SSRHeight, Tips.ssrDepthText);
-                                    me.ShaderProperty(_VRSSR, "Enable in VR");
+                                    me.ShaderProperty(_VRSSR, "在 VR 中启用");
                                 });
                             }
                         }
@@ -876,10 +876,10 @@ namespace Mochie {
                             MGUI.ToggleFloat(me, Tips.reflShadows, _SpecularOcclusionToggle, _SpecularOcclusionStrength);
                             if (_SpecularOcclusionToggle.floatValue == 1){
                                 MGUI.PropertyGroup(()=>{
-                                    me.ShaderProperty(_SpecularOcclusionTint, "Lightmap Tint");
-                                    me.ShaderProperty(_SpecularOcclusionBrightness, "Lightmap Brightness");
-                                    me.ShaderProperty(_SpecularOcclusionContrast, "Lightmap Contrast");
-                                    me.ShaderProperty(_SpecularOcclusionHDR, "Lightmap HDR");
+                                    me.ShaderProperty(_SpecularOcclusionTint, "光照贴图色调");
+                                    me.ShaderProperty(_SpecularOcclusionBrightness, "光照贴图亮度");
+                                    me.ShaderProperty(_SpecularOcclusionContrast, "光照贴图对比度");
+                                    me.ShaderProperty(_SpecularOcclusionHDR, "光照贴图 HDR");
                                 });
                             }
                         }
@@ -889,7 +889,7 @@ namespace Mochie {
                         }
                     });
                     if (_SSRToggle.floatValue == 1 && !isLite){
-                        MGUI.DisplayInfo("Screenspace reflections in VRChat require the \"Depth Light\" prefab found in: Assets/Mochie/Unity/Prefabs or at least one directional light with shadows enabled in the scene. \n\nThey can also be expensive, please use them sparingly!");
+                        MGUI.DisplayInfo("VRChat 的屏幕空间反射需要位于 Assets/Mochie/Unity/Prefabs 中的“Depth Light”预制件，或场景中至少有一盏启用阴影的定向光。\n\n该功能性能开销较高，请谨慎使用。");
                     }
                 });
             }
@@ -899,53 +899,53 @@ namespace Mochie {
 
         #region Vertex Manip
         void DoVertexManipulation(Material mat){
-            if (Foldouts.DoFoldout(foldouts, mat, me, _VertexManipulationToggle, "Vertex Manipulation", Foldouts.Style.StandardToggle)){
+            if (Foldouts.DoFoldout(foldouts, mat, me, _VertexManipulationToggle, "顶点操作", Foldouts.Style.StandardToggle)){
                 MGUI.Space6();
-                MGUI.DisplayWarning("Please note that meshes set to 'batching static' may exhibit different behavior at runtime when using wind or rotation settings, it is recommended to use GPU instancing for these meshes instead. To do this: disable 'batching static' in the static toggle dropdown for the object, then tick 'Enable GPU Instancing' in the render settings for this material.");
+                MGUI.DisplayWarning("请注意，使用风或旋转设置时，设置为“批处理静态”的网格可能会在运行时表现出不同的行为，建议对这些网格使用 GPU 实例化。为此：在对象的静态切换下拉列表中禁用“批处理静态”，然后在该材质的渲染设置中勾选“启用 GPU 实例化”。");
                 MGUI.SpaceN4();
                 MGUI.ToggleGroup(_VertexManipulationToggle.floatValue == 0);
                 MGUI.PropertyGroupParent(()=>{
                     MGUI.PropertyGroup(()=>{
                         me.TexturePropertySingleLine(Tips.maskText, _VertexMask, _VertexMask.textureValue ? _VertexMaskChannel : null);
-                        MGUI.Vector3Field(_VertexRotationStatic, "Static Rotation", false);
-                        MGUI.Vector3Field(_VertexRotationAnimated, "Animated Rotation", false);
-                        MGUI.Vector3Field(_VertexOffset, "Offset", false);
+                        MGUI.Vector3Field(_VertexRotationStatic, "静态旋转", false);
+                        MGUI.Vector3Field(_VertexRotationAnimated, "动画旋转", false);
+                        MGUI.Vector3Field(_VertexOffset, "偏移", false);
                         MGUI.Space1();
                     });
 
-                    MGUI.ShaderPropertyBold(me, _WindToggle, "Wind");
+                    MGUI.ShaderPropertyBold(me, _WindToggle, "风");
                     MGUI.ToggleGroup(_WindToggle.floatValue == 0);
                     MGUI.PropertyGroup(()=>{
                         MGUI.PropertyGroup(()=>{
-                            me.TexturePropertySingleLine(new GUIContent("Noise Texture"), _WindNoiseTex);
-                            me.ShaderProperty(_WindMaskingMode, "Masking Mode");
-                            me.ShaderProperty(_WindSymmetry, "Symmetry");
-                            me.ShaderProperty(_WindLayers, "Layers");
-                            MGUI.Vector3Field(_WindDirection, "Direction", false);
-                            me.ShaderProperty(_WindStrength, "Global Strength");
+                            me.TexturePropertySingleLine(new GUIContent("噪波贴图"), _WindNoiseTex);
+                            me.ShaderProperty(_WindMaskingMode, "遮罩模式");
+                            me.ShaderProperty(_WindSymmetry, "对称");
+                            me.ShaderProperty(_WindLayers, "层数");
+                            MGUI.Vector3Field(_WindDirection, "方向", false);
+                            me.ShaderProperty(_WindStrength, "全局强度");
                         });
                         MGUI.PropertyGroup(()=>{
-                            me.ShaderProperty(_WindContribution0, "Strength");
-                            MGUI.Vector2Field(_WindScale0, "Scale");
-                            MGUI.Vector2Field(_WindSpeed0, "Speed");
-                            me.ShaderProperty(_WindSmoothness0, "Smoothness");
+                            me.ShaderProperty(_WindContribution0, "强度");
+                            MGUI.Vector2Field(_WindScale0, "缩放");
+                            MGUI.Vector2Field(_WindSpeed0, "速度");
+                            me.ShaderProperty(_WindSmoothness0, "平滑度");
                         });
 
                         if (_WindLayers.floatValue > 1){
                             MGUI.PropertyGroup(()=>{
-                                me.ShaderProperty(_WindContribution1, "Strength");
-                                MGUI.Vector2Field(_WindScale1, "Scale");
-                                MGUI.Vector2Field(_WindSpeed1, "Speed");
-                                me.ShaderProperty(_WindSmoothness1, "Smoothness");
+                                me.ShaderProperty(_WindContribution1, "强度");
+                                MGUI.Vector2Field(_WindScale1, "缩放");
+                                MGUI.Vector2Field(_WindSpeed1, "速度");
+                                me.ShaderProperty(_WindSmoothness1, "平滑度");
                             });
                         }
 
                         if (_WindLayers.floatValue > 2){
                             MGUI.PropertyGroup(()=>{
-                                me.ShaderProperty(_WindContribution2, "Strength");
-                                MGUI.Vector2Field(_WindScale2, "Scale");
-                                MGUI.Vector2Field(_WindSpeed2, "Speed");
-                                me.ShaderProperty(_WindSmoothness2, "Smoothness");
+                                me.ShaderProperty(_WindContribution2, "强度");
+                                MGUI.Vector2Field(_WindScale2, "缩放");
+                                MGUI.Vector2Field(_WindSpeed2, "速度");
+                                me.ShaderProperty(_WindSmoothness2, "平滑度");
                             });
                         }
                     });
@@ -956,10 +956,10 @@ namespace Mochie {
             Foldouts.EndFoldout();
         }
         #endregion
-        
+
         #region Subsurface
         void DoSubsurface(Material mat){
-            if (Foldouts.DoFoldout(foldouts, mat, me, _Subsurface, "Subsurface Scattering", Foldouts.Style.StandardToggle)){
+            if (Foldouts.DoFoldout(foldouts, mat, me, _Subsurface, "次表面散射", Foldouts.Style.StandardToggle)){
                 MGUI.ToggleGroup(_Subsurface.floatValue == 0);
                 MGUI.PropertyGroupParent(()=>{
                     MGUI.PropertyGroup(() => {
@@ -983,7 +983,7 @@ namespace Mochie {
 
         #region Rain
         void DoRain(Material mat){
-            if (Foldouts.DoFoldout(foldouts, mat, me, _RainMode, "Rain", Foldouts.Style.StandardToggle)){
+            if (Foldouts.DoFoldout(foldouts, mat, me, _RainMode, "雨", Foldouts.Style.StandardToggle)){
                 MGUI.PropertyGroupParent(()=>{
                     if (_RainMode.floatValue == 0 || _RainMode.floatValue == 1){
                         RainDroplets();
@@ -992,11 +992,11 @@ namespace Mochie {
                         RainRipples();
                     }
                     else if (_RainMode.floatValue == 3){
-                        MGUI.BoldLabel("Droplets");
+                        MGUI.BoldLabel("水滴");
                         RainDroplets();
-                        MGUI.BoldLabel("Ripples");
+                        MGUI.BoldLabel("涟漪");
                         RainRipples();
-                        MGUI.BoldLabel("Both");
+                        MGUI.BoldLabel("两者");
                         RainBoth();
                     }
                 });
@@ -1010,16 +1010,16 @@ namespace Mochie {
                 if (_RainMode.floatValue != 3){
                     me.TexturePropertySingleLine(Tips.maskText, _RainMask, _RainMask.textureValue ? _RainMaskChannel : null);
                 }
-                me.ShaderProperty(_RainStrength, "Strength");
-                me.ShaderProperty(_RainSpeed, "Speed");
-                me.ShaderProperty(_DynamicDroplets, "Dynamic Droplets");
+                me.ShaderProperty(_RainStrength, "强度");
+                me.ShaderProperty(_RainSpeed, "速度");
+                me.ShaderProperty(_DynamicDroplets, "动态水滴");
             });
             MGUI.PropertyGroup(()=>{
                 me.ShaderProperty(_UVRainSet, Tips.uvSetLabel.text);
                 if (_UVRainSet.floatValue >= 5)
                     me.ShaderProperty(_UVRainSwizzle, Tips.swizzleText);
-                MGUI.Vector2Field(_RainScale, "Scale");
-                me.ShaderProperty(_UVRainRotation, "Rotation");
+                MGUI.Vector2Field(_RainScale, "缩放");
+                me.ShaderProperty(_UVRainRotation, "旋转");
             });
             MGUI.ToggleGroupEnd();
         }
@@ -1029,64 +1029,64 @@ namespace Mochie {
                 if (_RainMode.floatValue != 3){
                     me.TexturePropertySingleLine(Tips.maskText, _RainMask, _RainMask.textureValue ? _RainMaskChannel : null);
                 }
-                me.ShaderProperty(_RippleStrength, "Strength");
-                me.ShaderProperty(_RippleSpeed, "Speed");
-                me.ShaderProperty(_RippleDensity, "Density");
-                me.ShaderProperty(_RippleSize, "Size");
+                me.ShaderProperty(_RippleStrength, "强度");
+                me.ShaderProperty(_RippleSpeed, "速度");
+                me.ShaderProperty(_RippleDensity, "密度");
+                me.ShaderProperty(_RippleSize, "尺寸");
                 me.ShaderProperty(_RippleHorizonAdjustment, Tips.horizonAdjustmentText);
-                me.ShaderProperty(_RippleHorizonAdjustmentDistance, "Adjustment Distance");
+                me.ShaderProperty(_RippleHorizonAdjustmentDistance, "调整距离");
             });
             if (_PuddleToggle.floatValue == 1){
                 MGUI.PropertyGroup(()=>{
-                    me.ShaderProperty(_PuddleRippleStrength, "Puddle Strength");
-                    me.ShaderProperty(_PuddleRippleSpeed, "Puddle Speed");
-                    me.ShaderProperty(_PuddleRippleDensity, "Puddle Density");
-                    me.ShaderProperty(_PuddleRippleSize, "Puddle Size");
+                    me.ShaderProperty(_PuddleRippleStrength, "水坑强度");
+                    me.ShaderProperty(_PuddleRippleSpeed, "水坑速度");
+                    me.ShaderProperty(_PuddleRippleDensity, "水坑密度");
+                    me.ShaderProperty(_PuddleRippleSize, "水坑尺寸");
                 });
             }
             MGUI.PropertyGroup(()=>{
                 me.ShaderProperty(_UVRippleSet, Tips.uvSetLabel.text);
                 if (_UVRippleSet.floatValue >= 5)
                     me.ShaderProperty(_UVRippleSwizzle, Tips.swizzleText);
-                MGUI.Vector2Field(_RippleScale, "Scale");
-                me.ShaderProperty(_UVRippleRotation, "Rotation");
+                MGUI.Vector2Field(_RippleScale, "缩放");
+                me.ShaderProperty(_UVRippleRotation, "旋转");
             });
         }
 
         void RainBoth(){
             MGUI.PropertyGroup(()=>{
                 me.TexturePropertySingleLine(Tips.maskText, _RainMask, _RainMask.textureValue ? _RainMaskChannel : null);
-                me.ShaderProperty(_RainThreshold, "Angle Threshold");
-                me.ShaderProperty(_RainThresholdSize, "Threshold Blend");
+                me.ShaderProperty(_RainThreshold, "角度阈值");
+                me.ShaderProperty(_RainThresholdSize, "阈值混合");
             });
         }
         #endregion
 
         #region Puddles
         void DoPuddles(Material mat){
-            if (Foldouts.DoFoldout(foldouts, mat, me, _PuddleToggle, "Puddles", Foldouts.Style.StandardToggle)){
+            if (Foldouts.DoFoldout(foldouts, mat, me, _PuddleToggle, "水坑", Foldouts.Style.StandardToggle)){
                 MGUI.ToggleGroup(_PuddleToggle.floatValue == 0);
                 MGUI.PropertyGroupParent(()=>{
                     MGUI.PropertyGroup(()=>{
                         if (_PuddleUseHeightMap.floatValue == 1 && isHeightmapped){
-                            me.ShaderProperty(_PuddleTint, "Color");
+                            me.ShaderProperty(_PuddleTint, "颜色");
                         }
                         else {
-                            me.TexturePropertySingleLine(new GUIContent("Puddle Map"), _PuddleTexture, _PuddleTint);
+                            me.TexturePropertySingleLine(new GUIContent("水坑贴图"), _PuddleTexture, _PuddleTint);
                         }
-                        MGUI.SliderMinMax01(_PuddleThresholdMin, _PuddleThresholdMax, "Threshold", 0);
-                        me.ShaderProperty(_PuddleStrength, "Strength");
-                        me.ShaderProperty(_PuddleMetallic, "Metallic");
+                        MGUI.SliderMinMax01(_PuddleThresholdMin, _PuddleThresholdMax, "阈值", 0);
+                        me.ShaderProperty(_PuddleStrength, "强度");
+                        me.ShaderProperty(_PuddleMetallic, "金属度");
                         if ((_PrimaryWorkflow.floatValue != 1 && _OcclusionMap.textureValue) || _PrimaryWorkflow.floatValue == 1)
-                            me.ShaderProperty(_PuddleOcclusionStrength, "Occlusion Strength");
-                        
+                            me.ShaderProperty(_PuddleOcclusionStrength, "环境光遮蔽强度");
+
                     });
                     if (isHeightmapped){
                         MGUI.PropertyGroup(()=>{
                             if (_PuddleUseHeightMap.floatValue == 0)
-                                me.ShaderProperty(_PuddleHeightStrength, "Height Strength");
-                            me.ShaderProperty(_PuddleUseHeightMap, "Use Height Map");
-                            me.ShaderProperty(_PuddleHeightBasedTint, "Height-Based Tinting");
+                                me.ShaderProperty(_PuddleHeightStrength, "高度强度");
+                            me.ShaderProperty(_PuddleUseHeightMap, "使用高度贴图");
+                            me.ShaderProperty(_PuddleHeightBasedTint, "基于高度的着色");
                         });
                     }
                     MGUI.PropertyGroup(()=>{
@@ -1094,7 +1094,7 @@ namespace Mochie {
                         if (_UVPuddleSet.floatValue >= 5)
                             me.ShaderProperty(_UVPuddleSwizzle, Tips.swizzleText);
                         MGUI.TextureSOScroll(me, _PuddleTexture, _UVPuddleScroll);
-                        me.ShaderProperty(_UVPuddleRotation, "Rotation");
+                        me.ShaderProperty(_UVPuddleRotation, "旋转");
                     });
                 });
                 MGUI.ToggleGroupEnd();
@@ -1105,45 +1105,45 @@ namespace Mochie {
 
         #region Filtering
         void DoFiltering(Material mat){
-            if (Foldouts.DoFoldout(foldouts, mat, me, _Filtering, "Filtering", Foldouts.Style.StandardToggle)){
+            if (Foldouts.DoFoldout(foldouts, mat, me, _Filtering, "滤镜", Foldouts.Style.StandardToggle)){
                 MGUI.ToggleGroup(_Filtering.floatValue == 0);
                 MGUI.PropertyGroupParent(()=>{
                     me.ShaderProperty(_HueMode, Tips.hueModeText);
                     me.ShaderProperty(_MonoTint, Tips.monoTintText);
                     MGUI.Space4();
-                    MGUI.BoldLabel("Post Processing");
+                    MGUI.BoldLabel("后处理");
                     MGUI.PropertyGroup(()=>{
                         // me.TexturePropertySingleLine(Tips.colorGradingLUTText, _ColorGradingLUT, _ColorGradingLUTStrength);
-                        me.ShaderProperty(_HuePost, "Hue");
-                        me.ShaderProperty(_SaturationPost, "Saturation");
-                        me.ShaderProperty(_BrightnessPost, "Brightness");
-                        me.ShaderProperty(_ContrastPost, "Contrast");
+                        me.ShaderProperty(_HuePost, "色调");
+                        me.ShaderProperty(_SaturationPost, "饱和度");
+                        me.ShaderProperty(_BrightnessPost, "亮度");
+                        me.ShaderProperty(_ContrastPost, "对比度");
                         me.ShaderProperty(_ACES, Tips.aces);
                     });
                     MGUI.Space4();
-                    MGUI.BoldLabel("Base Color");
+                    MGUI.BoldLabel("基础颜色");
                     MGUI.PropertyGroup(()=>{
-                        me.ShaderProperty(_Hue, "Hue");
-                        me.ShaderProperty(_Saturation, "Saturation");
-                        me.ShaderProperty(_Brightness, "Brightness");
-                        me.ShaderProperty(_Contrast, "Contrast");
+                        me.ShaderProperty(_Hue, "色调");
+                        me.ShaderProperty(_Saturation, "饱和度");
+                        me.ShaderProperty(_Brightness, "亮度");
+                        me.ShaderProperty(_Contrast, "对比度");
                     });
                     MGUI.Space4();
-                    MGUI.BoldLabel("Detail Base Color");
+                    MGUI.BoldLabel("细节基础颜色");
                     MGUI.PropertyGroup(()=>{
-                        me.ShaderProperty(_HueDet, "Hue");
-                        me.ShaderProperty(_SaturationDet, "Saturation");
-                        me.ShaderProperty(_BrightnessDet, "Brightness");
-                        me.ShaderProperty(_ContrastDet, "Contrast");
+                        me.ShaderProperty(_HueDet, "色调");
+                        me.ShaderProperty(_SaturationDet, "饱和度");
+                        me.ShaderProperty(_BrightnessDet, "亮度");
+                        me.ShaderProperty(_ContrastDet, "对比度");
                     });
                     if (emissionEnabled){
                         MGUI.Space4();
-                        MGUI.BoldLabel("Emission");
+                        MGUI.BoldLabel("自发光");
                         MGUI.PropertyGroup(()=>{
-                            me.ShaderProperty(_HueEmiss, "Hue");
-                            me.ShaderProperty(_SaturationEmiss, "Saturation");
-                            me.ShaderProperty(_BrightnessEmiss, "Brightness");
-                            me.ShaderProperty(_ContrastEmiss, "Contrast");
+                            me.ShaderProperty(_HueEmiss, "色调");
+                            me.ShaderProperty(_SaturationEmiss, "饱和度");
+                            me.ShaderProperty(_BrightnessEmiss, "亮度");
+                            me.ShaderProperty(_ContrastEmiss, "对比度");
                         });
                     }
                 });
@@ -1164,16 +1164,16 @@ namespace Mochie {
             bool needsVertexMaskUV = _VertexManipulationToggle.floatValue == 1 && _VertexMask.textureValue && !isLite;
 
             if (needsHeightMaskUV || needsDetailMaskUV || needsRainMaskUV || needsEmissionMaskUV || needsAlphaMaskUV || needsVertexMaskUV){
-                if (Foldouts.DoFoldout(foldouts, mat, "Extra UVs", Foldouts.Style.Standard)){
+                if (Foldouts.DoFoldout(foldouts, mat, "额外 UV", Foldouts.Style.Standard)){
                     MGUI.PropertyGroupParent(()=>{
                         if (needsDetailMaskUV){
-                            MGUI.BoldLabel("Detail Mask");
+                            MGUI.BoldLabel("细节遮罩");
                             MGUI.PropertyGroup(()=>{
                                 me.ShaderProperty(_UVDetailMaskSet, Tips.uvSetLabel.text);
                                 if (_UVDetailMaskSet.floatValue >= 5)
                                     me.ShaderProperty(_UVDetailMaskSwizzle, Tips.swizzleText);
                                 MGUI.TextureSOScroll(me, _DetailMask, _UVDetailMaskScroll);
-                                me.ShaderProperty(_UVDetailMaskRotation, "Rotation");
+                                me.ShaderProperty(_UVDetailMaskRotation, "旋转");
                             });
                         }
                         else {
@@ -1182,61 +1182,61 @@ namespace Mochie {
 
                         if (needsHeightMaskUV){
                             MGUI.Space4();
-                            MGUI.BoldLabel("Height Mask");
+                            MGUI.BoldLabel("高度遮罩");
                             MGUI.PropertyGroup(()=>{
                                 me.ShaderProperty(_UVHeightMaskSet, Tips.uvSetLabel.text);
                                 if (_UVHeightMaskSet.floatValue >= 5)
                                     me.ShaderProperty(_UVHeightMaskSwizzle, Tips.swizzleText);
                                 MGUI.TextureSOScroll(me, _HeightMask, _UVHeightMaskScroll);
-                                me.ShaderProperty(_UVHeightMaskRotation, "Rotation");
+                                me.ShaderProperty(_UVHeightMaskRotation, "旋转");
                             });
                         }
 
                         if (needsEmissionMaskUV){
                             MGUI.Space4();
-                            MGUI.BoldLabel("Emission Mask");
+                            MGUI.BoldLabel("自发光遮罩");
                             MGUI.PropertyGroup(()=>{
                                 me.ShaderProperty(_UVEmissionMaskSet, Tips.uvSetLabel.text);
                                 if (_UVEmissionMaskSet.floatValue >= 5)
                                     me.ShaderProperty(_UVEmissionMaskSwizzle, Tips.swizzleText);
                                 MGUI.TextureSOScroll(me, _EmissionMask, _UVEmissionMaskScroll);
-                                me.ShaderProperty(_UVEmissionMaskRotation, "Rotation");
+                                me.ShaderProperty(_UVEmissionMaskRotation, "旋转");
                             });
                         }
 
                         if (needsRainMaskUV){
                             MGUI.Space4();
-                            MGUI.BoldLabel("Rain Mask");
+                            MGUI.BoldLabel("雨的遮罩");
                             MGUI.PropertyGroup(()=>{
                                 me.ShaderProperty(_UVRainMaskSet, Tips.uvSetLabel.text);
                                 if (_UVRainMaskSet.floatValue >= 5)
                                     me.ShaderProperty(_UVRainMaskSwizzle, Tips.swizzleText);
                                 MGUI.TextureSOScroll(me, _RainMask, _UVRainMaskScroll);
-                                me.ShaderProperty(_UVRainMaskRotation, "Rotation");
+                                me.ShaderProperty(_UVRainMaskRotation, "旋转");
                             });
                         }
 
                         if (needsAlphaMaskUV){
                             MGUI.Space4();
-                            MGUI.BoldLabel("Alpha Mask");
+                            MGUI.BoldLabel("Alpha 遮罩");
                             MGUI.PropertyGroup(()=>{
                                 me.ShaderProperty(_UVAlphaMaskSet, Tips.uvSetLabel.text);
                                 if (_UVAlphaMaskSet.floatValue >= 5)
                                     me.ShaderProperty(_UVAlphaMaskSwizzle, Tips.swizzleText);
                                 MGUI.TextureSOScroll(me, _AlphaMask, _UVAlphaMaskScroll);
-                                me.ShaderProperty(_UVAlphaMaskRotation, "Rotation");
+                                me.ShaderProperty(_UVAlphaMaskRotation, "旋转");
                             });
                         }
 
                         if (needsVertexMaskUV){
                             MGUI.Space4();
-                            MGUI.BoldLabel("Vertex Manipulation Mask");
+                            MGUI.BoldLabel("顶点操作遮罩");
                             MGUI.PropertyGroup(()=>{
                                 me.ShaderProperty(_UVVertexMaskSet, Tips.uvSetLabel.text);
                                 if (_UVVertexMaskSet.floatValue >= 5)
                                     me.ShaderProperty(_UVVertexMaskSwizzle, Tips.swizzleText);
                                 MGUI.TextureSOScroll(me, _VertexMask, _UVVertexMaskScroll);
-                                me.ShaderProperty(_UVVertexMaskRotation, "Rotation");
+                                me.ShaderProperty(_UVVertexMaskRotation, "旋转");
                             });
                         }
                     });
@@ -1248,11 +1248,11 @@ namespace Mochie {
 
         #region Light Volumes
         void DoLightVolumes(Material mat) {
-            if (Foldouts.DoFoldout(foldouts, mat, me, _LightVolumesToggle, "Light Volumes", Foldouts.Style.StandardToggle)) {
+            if (Foldouts.DoFoldout(foldouts, mat, me, _LightVolumesToggle, "光照体积", Foldouts.Style.StandardToggle)) {
                 MGUI.ToggleGroup(_LightVolumesToggle.floatValue == 0);
                 MGUI.PropertyGroupParent(() => {
                     MGUI.PropertyGroup(() => {
-                        me.ShaderProperty(_LightVolumeStrength, "Strength");
+                        me.ShaderProperty(_LightVolumeStrength, "强度");
                         MGUI.ToggleFloat(me, Tips.additiveLightVolumeText, _AdditiveLightVolumesToggle, _AdditiveLightVolumeStrength);
                         MGUI.ToggleFloat(me, Tips.lightVolumeSpecText, _LightVolumeSpecularity, _LightVolumeSpecularityStrength);
                         me.ShaderProperty(_LightVolumeBias, Tips.lightVolumeBiasText);
@@ -1281,13 +1281,13 @@ namespace Mochie {
                 MGUI.ToggleGroup(_LTCGI.floatValue == 0);
                 MGUI.PropertyGroupParent(()=>{
                     MGUI.PropertyGroup(()=>{
-                        me.ShaderProperty(_LTCGIStrength, "Strength");
-                        me.ShaderProperty(_LTCGIRoughness, "Roughness Multiplier");
-                        me.ShaderProperty(_LTCGISpecularOcclusion, "Specular Occlusion");
+                        me.ShaderProperty(_LTCGIStrength, "强度");
+                        me.ShaderProperty(_LTCGIRoughness, "粗糙度倍率");
+                        me.ShaderProperty(_LTCGISpecularOcclusion, "高光遮蔽");
                     });
                     MGUI.PropertyGroup(()=>{
-                        me.ShaderProperty(_LTCGI_DiffuseColor, "Diffuse Color");
-                        me.ShaderProperty(_LTCGI_SpecularColor, "Specular Color");
+                        me.ShaderProperty(_LTCGI_DiffuseColor, "漫反射颜色");
+                        me.ShaderProperty(_LTCGI_SpecularColor, "高光颜色");
                     });
                 });
                 MGUI.ToggleGroupEnd();
@@ -1313,14 +1313,14 @@ namespace Mochie {
                 return;
             if(tex.mipmapCount <= 1) {
                 me.HelpBoxWithButton(
-                    EditorGUIUtility.TrTextContent("Mip maps are required, please enable them in the texture import settings."),
-                    EditorGUIUtility.TrTextContent("OK"));
+                    EditorGUIUtility.TrTextContent("需要 Mip 贴图，请在贴图导入设置中启用它们。"),
+                    EditorGUIUtility.TrTextContent("确定"));
                 return;
             }
             if(tex.filterMode != FilterMode.Trilinear) {
                 if(me.HelpBoxWithButton(
-                    EditorGUIUtility.TrTextContent("Trilinear filtering is required, and aniso is recommended."),
-                    EditorGUIUtility.TrTextContent("Fix Now"))) {
+                    EditorGUIUtility.TrTextContent("需要三线性过滤，建议启用各向异性过滤。"),
+                    EditorGUIUtility.TrTextContent("立即修复"))) {
                     tex.filterMode = FilterMode.Trilinear;
                     tex.anisoLevel = 1;
                     EditorUtility.SetDirty(tex);
@@ -1334,9 +1334,9 @@ namespace Mochie {
                 MGUI.ToggleGroup(_AreaLitToggle.floatValue == 0);
                 MGUI.PropertyGroupParent(()=>{
                     MGUI.PropertyGroup(()=>{
-                        me.ShaderProperty(_AreaLitStrength, "Strength");
-                        me.ShaderProperty(_AreaLitRoughnessMultiplier, "Roughness Multiplier");
-                        me.ShaderProperty(_AreaLitSpecularOcclusion, "Specular Occlusion");
+                        me.ShaderProperty(_AreaLitStrength, "强度");
+                        me.ShaderProperty(_AreaLitRoughnessMultiplier, "粗糙度倍率");
+                        me.ShaderProperty(_AreaLitSpecularOcclusion, "高光遮蔽");
                         me.ShaderProperty(_OpaqueLights, Tips.opaqueLightsText);
                     });
                     MGUI.PropertyGroup(()=>{
@@ -1352,13 +1352,13 @@ namespace Mochie {
                         CheckTrilinear(_LightTex2.textureValue);
                         me.TexturePropertySingleLine(Tips.lightTex3Text, _LightTex3);
                         CheckTrilinear(_LightTex3.textureValue);
-                        me.TexturePropertySingleLine(new GUIContent("Occlusion"), _AreaLitOcclusion);
+                        me.TexturePropertySingleLine(new GUIContent("环境光遮蔽"), _AreaLitOcclusion);
                         if (_AreaLitOcclusion.textureValue){
-                            me.ShaderProperty(_AreaLitOcclusionUVSet, "UV Set");
+                            me.ShaderProperty(_AreaLitOcclusionUVSet, "UV 集");
                         }
                         MGUI.TextureSO(me, _AreaLitOcclusion, _AreaLitOcclusion.textureValue);
                     });
-                    MGUI.DisplayInfo("Note that the AreaLit package files MUST be inside a folder named AreaLit (case sensitive) directly in the Assets folder (Assets/AreaLit)");
+                    MGUI.DisplayInfo("AreaLit 包文件必须位于 Assets 文件夹下直接创建的、名为 AreaLit 的文件夹中（区分大小写，路径为 Assets/AreaLit）。");
                 });
                 MGUI.ToggleGroupEnd();
             }
@@ -1368,23 +1368,23 @@ namespace Mochie {
 
         #region Lightmap Settings
         void DoLightmapSettings(Material mat){
-            if (Foldouts.DoFoldout(foldouts, mat, "Lightmap Settings", Foldouts.Style.Standard)){
+            if (Foldouts.DoFoldout(foldouts, mat, "光照贴图设置", Foldouts.Style.Standard)){
                 MGUI.PropertyGroupParent(()=>{
                     MGUI.PropertyGroup(()=>{
                         me.ShaderProperty(_BakeryMode, Tips.bakeryMode);
-                        MGUI.ToggleFloat(me, "Bakery Specular Highlights", _BAKERY_LMSPEC, _BakeryLMSpecStrength);
+                        MGUI.ToggleFloat(me, "Bakery 高光", _BAKERY_LMSPEC, _BakeryLMSpecStrength);
                     });
                     MGUI.PropertyGroup(()=>{
                         me.ShaderProperty(_BicubicSampling, Tips.bicubicLightmap);
                         if ((_PrimaryWorkflow.floatValue != 1 && _HeightMap.textureValue) || (_PrimaryWorkflow.floatValue == 1 && _PackedHeight.floatValue == 1))
                             me.ShaderProperty(_ApplyHeightOffset, Tips.heightmapLightmapText);
-                        me.ShaderProperty(_BAKERY_SHNONLINEAR, "Non-Linear SH");
+                        me.ShaderProperty(_BAKERY_SHNONLINEAR, "非线性球谐");
                         me.DoubleSidedGIField();
                         me.ShaderProperty(_IgnoreRealtimeGI, Tips.ignoreRealtimeGIText);
                     });
                     if ((_PrimaryWorkflow.floatValue != 1 && _HeightMap.textureValue) || (_PrimaryWorkflow.floatValue == 1 && _PackedHeight.floatValue == 1)){
                         if (_ApplyHeightOffset.floatValue == 1){
-                            MGUI.DisplayWarning("Please note that due to lightmaps being atlased, manipulating their uvs often reveals visual artifacts, and is often not recommended. Be sure to check for artifacts if using this option.");
+                            MGUI.DisplayWarning("请注意，光照贴图经过图集化处理，修改 UV 通常会产生视觉伪影，因此一般不建议这样做。如果使用此选项，请务必检查是否出现伪影。");
                         }
                     }
                 });
@@ -1395,14 +1395,14 @@ namespace Mochie {
 
         #region Render Settings
         void DoRenderSettings(Material mat){
-            if (Foldouts.DoFoldout(foldouts, mat, "Render Settings", Foldouts.Style.Standard)){
+            if (Foldouts.DoFoldout(foldouts, mat, "渲染设置", Foldouts.Style.Standard)){
                 MGUI.PropertyGroupParent(()=>{
                     MGUI.PropertyGroup(()=>{
                         me.ShaderProperty(_Culling, Tips.culling);
                         _QueueOffset.floatValue = (int)_QueueOffset.floatValue;
                         me.ShaderProperty(_QueueOffset, Tips.queueOffset);
                         MGUI.SpaceN1();
-                        MGUI.DummyProperty("Render Queue:", mat.renderQueue.ToString());
+                        MGUI.DummyProperty("渲染队列：", mat.renderQueue.ToString());
                     });
                     MGUI.PropertyGroup(()=>{
                         me.TexturePropertySingleLine(Tips.defaultSamplerText, _DefaultSampler);
@@ -1413,7 +1413,7 @@ namespace Mochie {
                         me.ShaderProperty(_VertexBaseColor, Tips.vertexBaseColorText);
                         me.ShaderProperty(_FlipBackfaceNormals, Tips.flipBackfaceNormalsText);
                         me.EnableInstancingField();
-                        me.ShaderProperty(_MaterialDebugMode, "Debug Mode");
+                        me.ShaderProperty(_MaterialDebugMode, "调试模式");
                     });
                 });
             }
@@ -1424,26 +1424,26 @@ namespace Mochie {
         #region Debug Menu
         void DoDebug(Material mat){
             if (_MaterialDebugMode.floatValue == 1){
-                if (Foldouts.DoFoldout(foldouts, mat, "Debug", Foldouts.Style.Standard)){
+                if (Foldouts.DoFoldout(foldouts, mat, "调试", Foldouts.Style.Standard)){
                     MGUI.PropertyGroupParent(()=>{
-                        MGUI.EnumDropdown<DebugFlags>(_DebugFlags, new GUIContent("Debug View"));
+                        MGUI.EnumDropdown<DebugFlags>(_DebugFlags, new GUIContent("调试视图"));
 
-                        MGUI.BoldLabel("Default Textures");
+                        MGUI.BoldLabel("默认贴图");
                         MGUI.PropertyGroup(()=>{
-                            me.TexturePropertySingleLine(new GUIContent("LUT for Filament SM"), _DFG);
-                            me.TexturePropertySingleLine(new GUIContent("SSR Noise Texture"), _NoiseTexSSR);
-                            me.TexturePropertySingleLine(new GUIContent("Droplet Map"), _DropletMask);
-                            me.TexturePropertySingleLine(new GUIContent("Rain Texture Sheet"), _RainSheet);
-                            me.ShaderProperty(_RainColumns, "Rain Texture Sheet Columns");
-                            me.ShaderProperty(_RainRows, "Rain Texture Sheet Rows");
+                            me.TexturePropertySingleLine(new GUIContent("Filament SM 的 LUT"), _DFG);
+                            me.TexturePropertySingleLine(new GUIContent("SSR 噪波贴图"), _NoiseTexSSR);
+                            me.TexturePropertySingleLine(new GUIContent("水滴贴图"), _DropletMask);
+                            me.TexturePropertySingleLine(new GUIContent("雨序列帧图集"), _RainSheet);
+                            me.ShaderProperty(_RainColumns, "雨序列帧列数");
+                            me.ShaderProperty(_RainRows, "雨序列帧行数");
                         });
 
-                        MGUI.BoldLabel("Render Settings");
+                        MGUI.BoldLabel("渲染设置");
                         MGUI.PropertyGroup(()=>{
-                            me.ShaderProperty(_SrcBlend, "Source Blend Op");
-                            me.ShaderProperty(_DstBlend, "Destination Blend Op");
-                            me.ShaderProperty(_ZWrite, "ZWrite");
-                            me.ShaderProperty(_ZTest, "ZTest");
+                            me.ShaderProperty(_SrcBlend, "源混合操作");
+                            me.ShaderProperty(_DstBlend, "目标混合操作");
+                            me.ShaderProperty(_ZWrite, "Z 写入");
+                            me.ShaderProperty(_ZTest, "Z 测试");
                         });
                     });
                 }
@@ -1469,7 +1469,7 @@ namespace Mochie {
         }
 
         void SetKeywords(Material mat){
-            
+
             MGUI.ClearKeywords(mat);
             MaterialEditor.FixupEmissiveFlag(mat);
             bool isEmissive = (mat.globalIlluminationFlags & MaterialGlobalIlluminationFlags.EmissiveIsBlack) == 0;
@@ -1531,7 +1531,7 @@ namespace Mochie {
             int blendMode = SafeGetInt(mat, "_BlendMode");
             int queueOffset = SafeGetInt(mat, "_QueueOffset");
             if (mat.HasProperty("_AlphaToMask"))
-                mat.SetInt("_AlphaToMask", blendMode == 1 ? 1 : 0);	
+                mat.SetInt("_AlphaToMask", blendMode == 1 ? 1 : 0);
 
             switch (blendMode){
                 case 0:
