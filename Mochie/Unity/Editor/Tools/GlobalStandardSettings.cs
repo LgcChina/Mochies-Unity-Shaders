@@ -560,13 +560,17 @@ namespace Mochie {
             materials.AddRange(standardMobileMaterials);
             if (materials.Count > 0)
                 Undo.RecordObjects(materials.ToArray(), "Restore Default Textures");
-            string texFolder = "Assets/Mochie/Unity/Textures/";
-            Texture dfgTex = AssetDatabase.LoadAssetAtPath(texFolder + "dfg-multiscatter.exr", typeof(Texture)) as Texture;
-            Texture rainSheetTex = AssetDatabase.LoadAssetAtPath(texFolder + "Glass_Rain_Texturesheet.png", typeof(Texture)) as Texture;
-            Texture defaultTex = AssetDatabase.LoadAssetAtPath(texFolder + "White Swatch (Primary).png", typeof(Texture)) as Texture;
-            Texture defaultDetailTex = AssetDatabase.LoadAssetAtPath(texFolder + "White Swatch (Detail).png", typeof(Texture)) as Texture;
-            Texture dropletMaskTex = AssetDatabase.LoadAssetAtPath(texFolder + "Droplet Mask.tif", typeof(Texture)) as Texture;
-            Texture ssrNoiseTex = AssetDatabase.LoadAssetAtPath(texFolder + "SSR Noise.png", typeof(Texture)) as Texture;
+            string texFolder = FindPackageTextureFolder();
+            if (string.IsNullOrEmpty(texFolder)){
+                MGUI.DisplayError("无法在 VPM 包内找到恢复默认贴图所需的资源。请重新安装 com.lgcchina.mochies-shaders。");
+                return;
+            }
+            Texture dfgTex = AssetDatabase.LoadAssetAtPath<Texture>(texFolder + "/dfg-multiscatter.exr");
+            Texture rainSheetTex = AssetDatabase.LoadAssetAtPath<Texture>(texFolder + "/Glass_Rain_Texturesheet.png");
+            Texture defaultTex = AssetDatabase.LoadAssetAtPath<Texture>(texFolder + "/White Swatch (Primary).png");
+            Texture defaultDetailTex = AssetDatabase.LoadAssetAtPath<Texture>(texFolder + "/White Swatch (Detail).png");
+            Texture dropletMaskTex = AssetDatabase.LoadAssetAtPath<Texture>(texFolder + "/Droplet Mask.tif");
+            Texture ssrNoiseTex = AssetDatabase.LoadAssetAtPath<Texture>(texFolder + "/SSR Noise.png");
             foreach (Material m in materials){
                 m.SetTexture("_DefaultSampler", defaultTex);
                 m.SetTexture("_DefaultDetailSampler", defaultDetailTex);
@@ -575,6 +579,19 @@ namespace Mochie {
                 m.SetTexture("_DropletMask", dropletMaskTex);
                 m.SetTexture("_NoiseTexSSR", ssrNoiseTex);
             }
+        }
+
+        static string FindPackageTextureFolder(){
+            string[] guids = AssetDatabase.FindAssets("GlobalStandardSettings t:MonoScript", new[] {"Packages"});
+            foreach (string guid in guids){
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                if (Path.GetFileNameWithoutExtension(path) != "GlobalStandardSettings")
+                    continue;
+                UnityEditor.PackageManager.PackageInfo package = UnityEditor.PackageManager.PackageInfo.FindForAssetPath(path);
+                if (package != null && package.name == "com.lgcchina.mochies-shaders")
+                    return (package.assetPath + "/Mochie/Unity/Textures").Replace("\\", "/");
+            }
+            return null;
         }
 
         void RefreshMaterials(){

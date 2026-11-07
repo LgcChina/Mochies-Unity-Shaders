@@ -11,7 +11,7 @@ namespace Mochie {
         public static GUIContent RGBMatrixTex = new GUIContent("RGB 矩阵贴图", "RGB 像素布局图案。");
         public static GUIContent smoothTex = new GUIContent("粗糙度");
         public static GUIContent flipbookTex = new GUIContent("序列帧");
-        string versionLabel = "v1.4.2 | LGC 中文版 1.78.1";
+        string versionLabel = "v1.4.2 | LGC 中文版 1.78.2";
         bool isTransparent = false;
         MaterialProperty _MainTex = null;
         MaterialProperty _RGBSubPixelTex = null;

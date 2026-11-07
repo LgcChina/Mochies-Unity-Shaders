@@ -1,6 +1,6 @@
 # Mochie Shaders LGC 中文版维护说明
 
-> 当前版本：`1.78.1`  
+> 当前版本：`1.78.2`
 > 更新日期：`2026-11-07`  
 > 上游基线：`MochiesCode/Mochies-Unity-Shaders` 的 `cf00c15`（`v1.78 update`）  
 > VPM 包名：`com.lgcchina.mochies-shaders`  
@@ -10,7 +10,7 @@
 
 - 当前实现直接翻译 Unity 材质检查器源码中的显示字符串，不使用运行时翻译层。
 - 只修改 `Mochie/Unity/Editor/` 下的检查器界面文本。
-- Shader 实现、贴图、预制件、资源路径和内部标识均不在汉化范围内。
+- Shader 实现、贴图、预制件、资源路径和内部标识均不在汉化范围内；与 VPM 安装位置相关的硬编码路径不属于翻译，已单独修正。
 - 11 个源码文件已完成中文检查器文本处理：
   - `Mochie/Unity/Editor/StandardEditor.cs`
   - `Mochie/Unity/Editor/WaterEditor.cs`
@@ -23,7 +23,10 @@
   - `Mochie/Unity/Editor/Common/Tips.cs`
   - `Mochie/Unity/Editor/Common/MGUI.cs`
   - `Mochie/Unity/Editor/Common/Foldouts.cs`
-- 8 个材质检查器页脚已显示 `LGC 中文版 1.78.1`。
+- 8 个材质检查器页脚已显示 `LGC 中文版 1.78.2`。
+- `package.json` 已使用 `legacyFolders` 自动清理旧的 `Assets/Mochie`，避免重复类型、Shader 名称和 GUID 冲突。
+- 渐变贴图生成到 `Assets/LGC/MochieShaders/Textures/Ramps`，不再尝试写入只读的 VPM 包目录。
+- “恢复默认贴图”改为从 `Packages` 动态查找包内资源，不再依赖 `Assets/Mochie/Unity/Textures`。
 - 当前机器未找到可用的 Unity 可执行文件，因此尚未完成 Unity 内的实际界面截图检查。
 
 ## 为什么上游更新后中文可能消失
@@ -51,7 +54,7 @@ origin   https://github.com/LgcChina/Mochies-Unity-Shaders.git
 upstream https://github.com/MochiesCode/Mochies-Unity-Shaders.git
 ```
 
-建议每次发布前都提交当前汉化，再给提交打与 `package.json` 相同的 Git 标签，例如 `1.78.1`。这样上游更新出现问题时可以随时回到上一份可用中文版。
+建议每次发布前都提交当前汉化，再给提交打与 `package.json` 相同的 Git 标签，例如 `1.78.2`。这样上游更新出现问题时可以随时回到上一份可用中文版。
 
 ## 上游更新流程
 
@@ -171,11 +174,11 @@ rg -n 'versionLabel|DoFooter\(' Mochie/Unity/Editor --glob '*.cs'
 
 `package.json` 中以下值必须一致：
 
-- `version`：`1.78.1`
-- Git 标签：`1.78.1`
-- GitHub Release 标签：`1.78.1`
-- Release 中的 ZIP 文件名：`com.lgcchina.mochies-shaders-1.78.1.zip`
-- ZIP 内 `package.json` 的 `version`：`1.78.1`
+- `version`：`1.78.2`
+- Git 标签：`1.78.2`
+- GitHub Release 标签：`1.78.2`
+- Release 中的 ZIP 文件名：`com.lgcchina.mochies-shaders-1.78.2.zip`
+- ZIP 内 `package.json` 的 `version`：`1.78.2`
 
 VPM ZIP 根目录必须直接包含：
 
@@ -196,13 +199,46 @@ https://lgcchina.github.io/LGC-VRC-Packages/index.json
 
 版本条目至少需要正确的 `name`、`displayName`、`version`、`unity`、`description`、`author`、`url` 和 `zipSHA256`。`url` 指向上面的 GitHub Release ZIP，`zipSHA256` 必须根据最终上传的 ZIP 计算。
 
-## 安装冲突
+## 旧版安装冲突与 `legacyFolders`
 
-不要同时安装上游原版和本 VPM 包。两者包含相同 Shader 名称和资源 GUID，同时存在可能造成覆盖、材质引用错乱或重复菜单。
+不能同时保留直接导入的 `Assets/Mochie` 和本 VPM 包。两者包含相同的 Editor 类型、Shader 名称和资源 GUID，可能造成重复类型、资源覆盖、材质引用错乱或脚本无法编译。只在安装后再弹窗提示并不可靠，因为重复类型可能使包内 Editor 脚本在弹窗运行前就编译失败。
 
-如果旧项目曾把上游文件直接放在 `Assets/` 中，安装本包前先删除旧目录。修改、移动或重命名 `Mochie/` 内资源时必须保留对应的 `.meta` 文件。
+本包在 `package.json` 中使用以下 VPM 迁移规则：
+
+```json
+"legacyFolders": {
+  "Assets\\Mochie": ""
+}
+```
+
+VCC/ACOM 会在安装或升级 VPM 包时处理该规则。VCC 2.0.0 及以后会把匹配的旧 `Assets/Mochie` 视为旧版安装，并在导入新版包前删除它。该处理发生在 Unity 编译脚本之前，因此比包内脚本检测更可靠。
+
+需要注意：
+
+- VPM 没有安装前确认弹窗。`legacyFolders` 会直接删除整个 `Assets/Mochie`，不会询问，也不会保留已修改文件。
+- 安装前必须备份项目；如果用户改过旧目录里的 Shader、预制件或贴图，应先复制到项目外，或重命名到不会匹配 `Assets/Mochie` 的位置。
+- 不要为了“帮助清理”再发布一个独立清理工具包。脚本编译冲突可能先发生，`legacyFolders` 是安装阶段就能生效的正确机制。
+- 本仓库没有根目录 `Mochie.meta`，因此这里只按旧路径匹配，不使用目录 GUID。不要凭 `Mochie/Unity.meta` 的 GUID 代替整个 `Assets/Mochie`。
+- 修改、移动或重命名包内资源时必须保留对应 `.meta`；这与清理旧目录是两件不同的事。
+
+“应用”渐变时，生成的阴影渐变和虹彩渐变会写入项目目录：
+
+```text
+Assets/LGC/MochieShaders/Textures/Ramps
+```
+
+这样既不会试图修改 VPM 缓存中的只读包，也不会再次创建 `Assets/Mochie`。
 
 ## 修改记录
+
+### 1.78.2 - 2026-11-07
+
+- 在 `package.json` 增加 `legacyFolders`，安装时自动移除旧的 `Assets/Mochie`，解决重复类型、Shader 名称和 GUID 冲突。
+- 包描述加入安装前备份警告，并在维护文档记录 VPM 会直接删除旧目录的行为。
+- 将阴影和虹彩渐变贴图的生成位置改为 `Assets/LGC/MochieShaders/Textures/Ramps`。
+- 将“恢复默认贴图”改为动态查找 VPM 包内资源，不再硬编码 `Assets/Mochie/Unity/Textures`。
+- 将检查器里的 `Depth Light` 路径提示改为 VPM 包内目录，避免误导用户重新导入到 `Assets/Mochie`。
+- 将 8 个材质检查器页脚更新为 `LGC 中文版 1.78.2`。
 
 ### 1.78.1 - 2026-11-07
 

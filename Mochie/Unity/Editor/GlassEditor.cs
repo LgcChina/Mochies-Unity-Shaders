@@ -23,7 +23,7 @@ namespace Mochie {
             "渲染设置"
         }, 1);
 
-        string versionLabel = "v1.15.2 | LGC 中文版 1.78.1";
+        string versionLabel = "v1.15.2 | LGC 中文版 1.78.2";
 
         // Surface
         MaterialProperty _Workflow = null;

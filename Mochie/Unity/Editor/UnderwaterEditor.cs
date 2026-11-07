@@ -22,7 +22,7 @@ namespace Mochie {
             "雾"
         }, 0);
 
-        string versionLabel = "v1.3 | LGC 中文版 1.78.1";
+        string versionLabel = "v1.3 | LGC 中文版 1.78.2";
 
         // Base
         MaterialProperty _StencilRef = null;
@@ -113,7 +113,7 @@ namespace Mochie {
                                 MGUI.Vector3Field(_BoxOffset, "偏移", false);
                             }
                         });
-                        MGUI.DisplayInfo("   该着色器需要场景中存在“Depth Light”预制件。\n （发现于：Assets/Mochie/Unity/Prefabs）");
+                        MGUI.DisplayInfo("   该着色器需要场景中存在“Depth Light”预制件。\n （发现于：VPM 包内的 Unity/Prefabs 目录）");
                     });
                 }
                 Foldouts.EndFoldout();

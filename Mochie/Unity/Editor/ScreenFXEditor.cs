@@ -55,7 +55,7 @@ namespace Mochie {
                 "Sobel 滤镜",
         }, 0);
 
-        string versionLabel = "v1.22 | LGC 中文版 1.78.1";
+        string versionLabel = "v1.22 | LGC 中文版 1.78.2";
 
         // Commonly used strings
         string strengthLabel = "强度";
@@ -672,7 +672,7 @@ namespace Mochie {
                         });
                         if (_DistortionModel.floatValue == 2){
                             MGUI.PropertyGroup(()=>{
-                                MGUI.DisplayInfo("此功能需要在以下位置找到“Depth Light”预制件：Assets/Mochie/Unity/Prefabs");
+                                MGUI.DisplayInfo("此功能需要在 VPM 包内的 Unity/Prefabs 目录中找到“Depth Light”预制件。");
                                 me.ShaderProperty(_DistortionRadius, radiusLabel);
                                 me.ShaderProperty(_DistortionFade, fadeLabel);
                                 me.ShaderProperty(_DistortionP2O, p2oLabel);
@@ -708,7 +708,7 @@ namespace Mochie {
                                 me.ShaderProperty(_DoF, "景深");
                                 if (_DoF.floatValue == 1){
                                     MGUI.PropertyGroup(()=>{
-                                        MGUI.DisplayInfo("此功能需要在以下位置找到“Depth Light”预制件：Assets/Mochie/Unity/Prefabs");
+                                        MGUI.DisplayInfo("此功能需要在 VPM 包内的 Unity/Prefabs 目录中找到“Depth Light”预制件。");
                                         me.ShaderProperty(_DoFRadius, radiusLabel);
                                         me.ShaderProperty(_DoFFade, fadeLabel);
                                         me.ShaderProperty(_DoFP2O, p2oLabel);
@@ -721,7 +721,7 @@ namespace Mochie {
                                 me.ShaderProperty(_DoF, "景深");
                                 if (_DoF.floatValue == 1){
                                     MGUI.PropertyGroup(()=>{
-                                        MGUI.DisplayInfo("此功能需要在以下位置找到“Depth Light”预制件：Assets/Mochie/Unity/Prefabs");
+                                        MGUI.DisplayInfo("此功能需要在 VPM 包内的 Unity/Prefabs 目录中找到“Depth Light”预制件。");
                                         me.ShaderProperty(_DoFRadius, radiusLabel);
                                         me.ShaderProperty(_DoFFade, fadeLabel);
                                         me.ShaderProperty(_DoFP2O, p2oLabel);
@@ -817,7 +817,7 @@ namespace Mochie {
                             MGUI.ToggleGroup(_Triplanar.floatValue == 0);
                             DoFalloffSettings(me, _TPUseGlobal, _TPFalloffMode, _TPMinRange, _TPMaxRange, _TPBoxSize, _TPBoxOffset, _TPBlendDistance);
                             MGUI.PropertyGroup(()=>{
-                                MGUI.DisplayInfo("此功能需要在以下位置找到“Depth Light”预制件：Assets/Mochie/Unity/Prefabs");
+                                MGUI.DisplayInfo("此功能需要在 VPM 包内的 Unity/Prefabs 目录中找到“Depth Light”预制件。");
                                 me.TexturePropertySingleLine(tpTexLabel, _TPTexture, _TPColor);
                                 if (_TPTexture.textureValue){
                                     MGUI.TextureSO(me, _TPTexture);
@@ -853,7 +853,7 @@ namespace Mochie {
                             MGUI.ToggleGroup(_OutlineType.floatValue == 0);
                                 me.ShaderProperty(_OutlineCubeToggle, "颜色来源");
                                 DoFalloffSettings(me, _OLUseGlobal, _OLFalloffMode, _OLMinRange, _OLMaxRange, _OLBoxSize, _OLBoxOffset, _OLBlendDistance);
-                                MGUI.DisplayInfo("此功能需要场景中存在“Depth Light”预制件。\n（发现于：Assets/Mochie/Unity/Prefabs）");
+                                MGUI.DisplayInfo("此功能需要场景中存在“Depth Light”预制件。\n（发现于：VPM 包内的 Unity/Prefabs 目录）");
                                 if (_OutlineType.floatValue == 1){
                                     MGUI.PropertyGroup(()=>{
                                         me.ShaderProperty(_OutlineAltEnable, "启用混合色调");
@@ -944,7 +944,7 @@ namespace Mochie {
                             MGUI.ToggleGroup(_Fog.floatValue == 0);
                             DoFalloffSettings(me, _FogUseGlobal, _FogFalloffMode, _FogMinRange, _FogMaxRange, _FogBoxSize, _FogBoxOffset, _FogBlendDistance);
                             MGUI.PropertyGroup(()=>{
-                                MGUI.DisplayInfo("此功能需要在以下位置找到“Depth Light”预制件：Assets/Mochie/Unity/Prefabs");
+                                MGUI.DisplayInfo("此功能需要在 VPM 包内的 Unity/Prefabs 目录中找到“Depth Light”预制件。");
                                 me.ShaderProperty(_FogColor, colorLabel);
                                 me.ShaderProperty(_FogRadius, radiusLabel);
                                 me.ShaderProperty(_FogFade, fadeLabel);
@@ -1048,7 +1048,7 @@ namespace Mochie {
                                 MGUI.ToggleGroupEnd();
                             });
                             MGUI.SpaceN4();
-                            MGUI.DisplayInfo("此功能需要在以下位置找到“Depth Light”预制件：Assets/Mochie/Unity/Prefabs");
+                            MGUI.DisplayInfo("此功能需要在 VPM 包内的 Unity/Prefabs 目录中找到“Depth Light”预制件。");
                         }
                         Foldouts.EndFoldout();
 

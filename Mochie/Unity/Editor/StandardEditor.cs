@@ -28,7 +28,7 @@ namespace Mochie {
             "调试"
         }, 3);
 
-        string versionLabel = "v2.14.2 | LGC 中文版 1.78.1";
+        string versionLabel = "v2.14.2 | LGC 中文版 1.78.2";
 
         // Variant Settings
         MaterialProperty _BlendMode = null;
@@ -889,7 +889,7 @@ namespace Mochie {
                         }
                     });
                     if (_SSRToggle.floatValue == 1 && !isLite){
-                        MGUI.DisplayInfo("VRChat 的屏幕空间反射需要位于 Assets/Mochie/Unity/Prefabs 中的“Depth Light”预制件，或场景中至少有一盏启用阴影的定向光。\n\n该功能性能开销较高，请谨慎使用。");
+                        MGUI.DisplayInfo("VRChat 的屏幕空间反射需要位于 VPM 包内 Unity/Prefabs 目录中的“Depth Light”预制件，或场景中至少有一盏启用阴影的定向光。\n\n该功能性能开销较高，请谨慎使用。");
                     }
                 });
             }

@@ -45,7 +45,7 @@ namespace Mochie {
                 "渲染设置"
         }, 0);
 
-        string versionLabel = "v1.30 | LGC 中文版 1.78.1";
+        string versionLabel = "v1.30 | LGC 中文版 1.78.2";
 
         MaterialProperty _Color = null;
         MaterialProperty _NonGrabColor = null;
@@ -981,7 +981,7 @@ namespace Mochie {
                             }
                         });
                         if (_DepthEffects.floatValue == 1 && transMode == 2){
-                            MGUI.DisplayInfo("深度效果需要场景中存在“Depth Light”预制件。\n（发现于：Assets/Mochie/Unity/Prefabs）");
+                            MGUI.DisplayInfo("深度效果需要场景中存在“Depth Light”预制件。\n（发现于：VPM 包内的 Unity/Prefabs 目录）");
                             MGUI.Space2();
                         }
                     });

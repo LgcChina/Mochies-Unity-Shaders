@@ -114,9 +114,20 @@ namespace Mochie {
 
         static readonly int blendingLabelPos = 111;
 
-        static readonly string unityFolderPath = "Assets/Mochie/Unity";
-        string versionLabel = "v1.35.2 | LGC 中文版 1.78.1";
+        static readonly string rampsFolderPath = "Assets/LGC/MochieShaders/Textures/Ramps";
+        string versionLabel = "v1.35.2 | LGC 中文版 1.78.2";
         // β
+
+        static void EnsureAssetFolder(string folderPath){
+            string[] parts = folderPath.Split('/');
+            string current = parts[0];
+            for (int i = 1; i < parts.Length; i++){
+                string next = current + "/" + parts[i];
+                if (!AssetDatabase.IsValidFolder(next))
+                    AssetDatabase.CreateFolder(current, parts[i]);
+                current = next;
+            }
+        }
 
         MaterialProperty _RenderMode = null;
         MaterialProperty _CullingMode = null;
@@ -710,9 +721,9 @@ namespace Mochie {
             // Using this to mercilessly murder verts when necessary (must be 0)
             _NaNLmao.floatValue = 0.0f;
 
-            // Generate path sensitive folders if necessary
-            if (!AssetDatabase.IsValidFolder(unityFolderPath+"/Textures/Ramps"))
-                AssetDatabase.CreateFolder(unityFolderPath+"/Textures", "Ramps");
+            // Generated ramps must stay outside the read-only VPM package directory
+            if (!AssetDatabase.IsValidFolder(rampsFolderPath))
+                EnsureAssetFolder(rampsFolderPath);
 
             float blendMode = _BlendMode.floatValue;
             float workflow = _PBRWorkflow.floatValue;
@@ -1183,7 +1194,7 @@ namespace Mochie {
                                     if (MGUI.SimpleButton("应用", MGUI.GetPropertyWidth(), EditorGUIUtility.labelWidth)){
                                         byte[] encodedTex = rampTex.EncodeToPNG();
                                         int rampID = UnityEngine.Random.Range(0,10000000);
-                                        string rampPath = unityFolderPath+"/Textures/Ramps/Ramp_"+rampID+".png";
+                                        string rampPath = rampsFolderPath+"/Ramp_"+rampID+".png";
                                         MGUI.WriteBytes(encodedTex, rampPath);
                                         AssetDatabase.ImportAsset(rampPath);
 
@@ -1191,7 +1202,7 @@ namespace Mochie {
                                         importer.wrapMode = TextureWrapMode.Clamp;
                                         importer.SaveAndReimport();
 
-                                        _ShadowRamp.textureValue = (Texture)EditorGUIUtility.Load(rampPath);
+                                        _ShadowRamp.textureValue = AssetDatabase.LoadAssetAtPath<Texture>(rampPath);
                                     }
                                 });
                             }
@@ -1231,7 +1242,7 @@ namespace Mochie {
                         if (_SSR.floatValue == 1){
                             MGUI.PropertyGroup(() => {
                                 MGUI.DisplayInfo("SSR 需要 2501 或更高的渲染队列才能正常运行。");
-                                MGUI.DisplayInfo("\nVRChat 的 SSR 需要位于 Assets/Mochie/Unity/Prefabs 中的“Depth Light”预制件。\n每个场景或头像只能使用一种材质。\n\n该功能性能开销很高，请谨慎使用。\n");
+                                MGUI.DisplayInfo("\nVRChat 的 SSR 需要位于 VPM 包内 Unity/Prefabs 目录中的“Depth Light”预制件。\n每个场景或头像只能使用一种材质。\n\n该功能性能开销很高，请谨慎使用。\n");
                                 me.ShaderProperty(_Alpha, "强度");
                                 me.ShaderProperty(_MaxSteps, "最大步数");
                                 me.ShaderProperty(_Step, "步长");
@@ -1472,7 +1483,7 @@ namespace Mochie {
                                     if (MGUI.SimpleButton("应用", MGUI.GetPropertyWidth(), EditorGUIUtility.labelWidth)){
                                         byte[] iridescenceEncodedTex = iridescenceRampTex.EncodeToPNG();
                                         int iridescenceRampID = UnityEngine.Random.Range(0,10000000);
-                                        string iridescenceRampPath = unityFolderPath+"/Textures/Ramps/Ramp_"+iridescenceRampID+".png";
+                                        string iridescenceRampPath = rampsFolderPath+"/Ramp_"+iridescenceRampID+".png";
                                         MGUI.WriteBytes(iridescenceEncodedTex, iridescenceRampPath);
                                         AssetDatabase.ImportAsset(iridescenceRampPath);
 
@@ -1480,7 +1491,7 @@ namespace Mochie {
                                         importer.wrapMode = TextureWrapMode.Clamp;
                                         importer.SaveAndReimport();
 
-                                        _IridescenceRamp.textureValue = (Texture)EditorGUIUtility.Load(iridescenceRampPath);
+                                        _IridescenceRamp.textureValue = AssetDatabase.LoadAssetAtPath<Texture>(iridescenceRampPath);
                                     }
                                 }
                                 me.ShaderProperty(_IridescenceStrength, "强度");
