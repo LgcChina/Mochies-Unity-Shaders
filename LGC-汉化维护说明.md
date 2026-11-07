@@ -1,6 +1,6 @@
 # Mochie Shaders LGC 中文版维护说明
 
-> 当前版本：`1.78.2`
+> 当前版本：`1.78.3`
 > 更新日期：`2026-11-07`  
 > 上游基线：`MochiesCode/Mochies-Unity-Shaders` 的 `cf00c15`（`v1.78 update`）  
 > VPM 包名：`com.lgcchina.mochies-shaders`  
@@ -23,7 +23,7 @@
   - `Mochie/Unity/Editor/Common/Tips.cs`
   - `Mochie/Unity/Editor/Common/MGUI.cs`
   - `Mochie/Unity/Editor/Common/Foldouts.cs`
-- 8 个材质检查器页脚已显示 `LGC 中文版 1.78.2`。
+- 8 个材质检查器页脚已显示 `LGC 中文版 1.78.3`。
 - `package.json` 已使用 `legacyFolders` 自动清理旧的 `Assets/Mochie`，避免重复类型、Shader 名称和 GUID 冲突。
 - 渐变贴图生成到 `Assets/LGC/MochieShaders/Textures/Ramps`，不再尝试写入只读的 VPM 包目录。
 - “恢复默认贴图”改为从 `Packages` 动态查找包内资源，不再依赖 `Assets/Mochie/Unity/Textures`。
@@ -54,7 +54,7 @@ origin   https://github.com/LgcChina/Mochies-Unity-Shaders.git
 upstream https://github.com/MochiesCode/Mochies-Unity-Shaders.git
 ```
 
-建议每次发布前都提交当前汉化，再给提交打与 `package.json` 相同的 Git 标签，例如 `1.78.2`。这样上游更新出现问题时可以随时回到上一份可用中文版。
+建议每次发布前都提交当前汉化，再给提交打与 `package.json` 相同的 Git 标签，例如 `1.78.3`。这样上游更新出现问题时可以随时回到上一份可用中文版。
 
 ## 上游更新流程
 
@@ -78,7 +78,7 @@ git merge upstream/master
 6. 更新所有 `versionLabel` 中的 LGC 包版本，例如：
 
 ```csharp
-string versionLabel = "v2.14.2 | LGC 中文版 1.78.2";
+string versionLabel = "v2.14.2 | LGC 中文版 1.78.3";
 ```
 
 前半段保留作者原来的 Shader 版本，后半段使用本 VPM 包的版本。
@@ -174,11 +174,11 @@ rg -n 'versionLabel|DoFooter\(' Mochie/Unity/Editor --glob '*.cs'
 
 `package.json` 中以下值必须一致：
 
-- `version`：`1.78.2`
-- Git 标签：`1.78.2`
-- GitHub Release 标签：`1.78.2`
-- Release 中的 ZIP 文件名：`com.lgcchina.mochies-shaders-1.78.2.zip`
-- ZIP 内 `package.json` 的 `version`：`1.78.2`
+- `version`：`1.78.3`
+- Git 标签：`1.78.3`
+- GitHub Release 标签：`1.78.3`
+- Release 中的 ZIP 文件名：`com.lgcchina.mochies-shaders-1.78.3.zip`
+- ZIP 内 `package.json` 的 `version`：`1.78.3`
 
 VPM ZIP 根目录必须直接包含：
 
@@ -216,7 +216,8 @@ VCC/ACOM 会在安装或升级 VPM 包时处理该规则。VCC 2.0.0 及以后�
 需要注意：
 
 - VPM 没有安装前确认弹窗。`legacyFolders` 会直接删除整个 `Assets/Mochie`，不会询问，也不会保留已修改文件。
-- 安装前必须备份项目；如果用户改过旧目录里的 Shader、预制件或贴图，应先复制到项目外，或重命名到不会匹配 `Assets/Mochie` 的位置。
+- 安装前必须备份项目；如果用户改过旧目录里的 Shader、预制件或贴图，必须先把备份移到项目外，例如项目根目录的 `Mochie_Backup`（与 `Assets` 同级），或者打包成项目外的 ZIP。
+- 不要只把旧目录改名后继续放在 `Assets` 下，例如 `Assets/Mochie_Backup`。Unity 仍会编译其中的 Editor 类型，重复类型冲突不会消失，同时 `legacyFolders` 也不会清理这个改名后的目录。
 - 不要为了“帮助清理”再发布一个独立清理工具包。脚本编译冲突可能先发生，`legacyFolders` 是安装阶段就能生效的正确机制。
 - 本仓库没有根目录 `Mochie.meta`，因此这里只按旧路径匹配，不使用目录 GUID。不要凭 `Mochie/Unity.meta` 的 GUID 代替整个 `Assets/Mochie`。
 - 修改、移动或重命名包内资源时必须保留对应 `.meta`；这与清理旧目录是两件不同的事。
@@ -230,6 +231,12 @@ Assets/LGC/MochieShaders/Textures/Ramps
 这样既不会试图修改 VPM 缓存中的只读包，也不会再次创建 `Assets/Mochie`。
 
 ## 修改记录
+
+### 1.78.3 - 2026-11-07
+
+- 明确旧版备份必须移到 `Assets` 目录外，不能只在 `Assets` 内改名保留。
+- 包描述改为明确提示安装会直接删除旧版 `Assets/Mochie` 且不会询问。
+- 将 8 个材质检查器页脚更新为 `LGC 中文版 1.78.3`。
 
 ### 1.78.2 - 2026-11-07
 

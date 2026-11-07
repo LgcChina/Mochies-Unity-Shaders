@@ -45,7 +45,7 @@ namespace Mochie {
                 "渲染设置"
         }, 0);
 
-        string versionLabel = "v1.30 | LGC 中文版 1.78.2";
+        string versionLabel = "v1.30 | LGC 中文版 1.78.3";
 
         MaterialProperty _Color = null;
         MaterialProperty _NonGrabColor = null;

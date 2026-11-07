@@ -22,7 +22,7 @@ namespace Mochie {
             "雾"
         }, 0);
 
-        string versionLabel = "v1.3 | LGC 中文版 1.78.2";
+        string versionLabel = "v1.3 | LGC 中文版 1.78.3";
 
         // Base
         MaterialProperty _StencilRef = null;

@@ -36,7 +36,7 @@ namespace Mochie {
                 "渲染设置"
         }, 0);
 
-        string versionLabel = "v3.3.2 | LGC 中文版 1.78.2";
+        string versionLabel = "v3.3.2 | LGC 中文版 1.78.3";
 
         // Render Settings
         MaterialProperty _BlendMode = null;

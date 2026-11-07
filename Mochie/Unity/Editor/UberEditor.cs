@@ -115,7 +115,7 @@ namespace Mochie {
         static readonly int blendingLabelPos = 111;
 
         static readonly string rampsFolderPath = "Assets/LGC/MochieShaders/Textures/Ramps";
-        string versionLabel = "v1.35.2 | LGC 中文版 1.78.2";
+        string versionLabel = "v1.35.2 | LGC 中文版 1.78.3";
         // β
 
         static void EnsureAssetFolder(string folderPath){

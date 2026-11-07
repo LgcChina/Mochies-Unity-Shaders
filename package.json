@@ -1,9 +1,9 @@
 {
   "name": "com.lgcchina.mochies-shaders",
   "displayName": "Mochie Shaders 中文版（LGC）",
-  "version": "1.78.2",
+  "version": "1.78.3",
   "unity": "2022.3",
-  "description": "基于 MIT 许可上游项目 Mochie Shaders 的 VPM 中文版；仅汉化 Unity 材质检查器界面，保留 Shader 功能与内部标识不变。安装时会自动移除旧版 Assets/Mochie，请先备份项目。",
+  "description": "基于 MIT 许可上游项目 Mochie Shaders 的 VPM 中文版；仅汉化 Unity 材质检查器界面，保留 Shader 功能与内部标识不变。安装时会直接删除旧版 Assets/Mochie 且不会询问，请先把备份移到 Assets 目录外。",
   "author": {
     "name": "LgcChina",
     "url": "https://github.com/LgcChina"

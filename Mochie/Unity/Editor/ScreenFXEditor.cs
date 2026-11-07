@@ -55,7 +55,7 @@ namespace Mochie {
                 "Sobel 滤镜",
         }, 0);
 
-        string versionLabel = "v1.22 | LGC 中文版 1.78.2";
+        string versionLabel = "v1.22 | LGC 中文版 1.78.3";
 
         // Commonly used strings
         string strengthLabel = "强度";

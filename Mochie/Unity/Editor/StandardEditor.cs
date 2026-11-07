@@ -28,7 +28,7 @@ namespace Mochie {
             "调试"
         }, 3);
 
-        string versionLabel = "v2.14.2 | LGC 中文版 1.78.2";
+        string versionLabel = "v2.14.2 | LGC 中文版 1.78.3";
 
         // Variant Settings
         MaterialProperty _BlendMode = null;
